@@ -26,11 +26,11 @@
       <main class="main">
         <section class="topbar">
           <div>
-            <p class="eyebrow">MVP v0.1</p>
+            <p class="eyebrow">MVP v0.2</p>
             <h2 id="viewTitle">Opportunities</h2>
           </div>
           <div class="topbar-actions">
-            <label class="capacity-control" for="weeklyCapacity" data-tooltip="Total realistic hours you can spend on goals, initiatives, commitments, and new opportunities each week.">
+            <label class="capacity-control" for="weeklyCapacity" data-tooltip="Total realistic hours you can spend on goals, commitments, and new opportunities each week.">
               <span>Weekly Capacity</span>
               <div class="capacity-input">
                 <input id="weeklyCapacity" type="number" min="1" max="168" step="1" />
@@ -74,15 +74,30 @@
               <div class="load-track">
                 <div id="loadBar" class="load-bar"></div>
               </div>
-              <div id="capacityWarning" class="notice neutral">Add goals, action plans, and commitments to see your focus load.</div>
+              <div id="capacityWarning" class="notice neutral">Add goals and commitments to see your focus load.</div>
             </section>
 
             <section class="panel">
               <div class="panel-header">
-                <h3>Priority Goals</h3>
+                <h3>Current Focus</h3>
                 <button class="text-button" data-jump="goals">Manage</button>
               </div>
               <div id="goalSummary" class="summary-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h3>Decision Queue</h3>
+                <button class="text-button" data-jump="opportunities">Review</button>
+              </div>
+              <div id="decisionQueue" class="summary-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h3>Recent Decisions</h3>
+              </div>
+              <div id="recentDecisions" class="summary-list"></div>
             </section>
           </div>
         </section>
@@ -105,44 +120,31 @@
               <button type="submit">Add Goal</button>
             </form>
 
-            <form id="initiativeForm" class="form-panel">
-              <h3>Add Action Plan</h3>
-              <input name="name" required placeholder="Action, initiative, or project name" />
-              <select name="goalId" required></select>
-              <div class="two-col">
-                <label data-tooltip="Recurring weekly time this action needs while active.">Weekly hours
-                  <input name="estimatedWeeklyHours" type="number" min="0" step="0.5" value="3" required />
-                </label>
-                <label>Duration weeks
-                  <input name="estimatedDurationWeeks" type="number" min="1" step="1" value="8" />
-                </label>
-              </div>
-              <label>Progress
-                <input name="progress" type="range" min="0" max="100" value="0" />
-              </label>
-              <button type="submit">Add Action Plan</button>
-            </form>
-
             <form id="commitmentForm" class="form-panel">
-              <h3>Add Supporting Commitment</h3>
-              <input name="name" required placeholder="Activity name" />
+              <h3>Add Commitment</h3>
+              <input name="name" required placeholder="CPTS, HTB Machines, University, Gym" />
               <select name="goalId"></select>
               <div class="two-col">
                 <label>Weekly hours
                   <input name="weeklyHours" type="number" min="0" step="0.5" value="5" required />
                 </label>
-                <label data-tooltip="Energy cost is context for now and will later influence recommendation strength.">Energy cost
-                  <select name="energyCost">
-                    <option>low</option>
-                    <option selected>medium</option>
-                    <option>high</option>
-                  </select>
+                <label>Priority
+                  <input name="priority" type="number" min="1" max="10" value="7" required />
                 </label>
               </div>
-              <label>Type
-                <select name="type">
-                  <option value="fixed">Fixed</option>
-                  <option value="flexible">Flexible</option>
+              <div class="two-col">
+                <label>Start date
+                  <input name="startDate" type="date" />
+                </label>
+                <label>End date
+                  <input name="endDate" type="date" />
+                </label>
+              </div>
+              <label>Status
+                <select name="status">
+                  <option value="active" selected>Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="completed">Completed</option>
                 </select>
               </label>
               <textarea name="notes" placeholder="Notes"></textarea>
@@ -151,7 +153,7 @@
 
             <div class="panel">
               <div class="panel-header">
-                <h3>Goal Plans</h3>
+                <h3>Goals & Commitments</h3>
                 <span id="goalCount">0 active</span>
               </div>
               <div id="goalsList" class="entity-list"></div>
@@ -179,12 +181,8 @@
                     <option>networking</option>
                   </select>
                 </label>
-                <label>Urgency
-                  <select name="urgency">
-                    <option>low</option>
-                    <option selected>medium</option>
-                    <option>high</option>
-                  </select>
+                <label>Deadline
+                  <input name="deadline" type="date" />
                 </label>
               </div>
               <div class="two-col">
@@ -211,9 +209,12 @@
                   <input name="alignmentScore" type="number" min="1" max="10" value="6" required />
                 </label>
               </div>
-              <select name="relatedGoalId"></select>
-              <input name="expectedImpact" placeholder="Expected impact, comma separated" />
-              <button id="opportunitySubmit" type="submit">Add Opportunity</button>
+              <textarea name="notes" placeholder="Notes"></textarea>
+              <input name="expectedImpact" placeholder="Expected gain, comma separated" />
+              <div class="button-row">
+                <button id="reviewLaterSubmit" type="submit" name="reviewMode" value="later">Review Later</button>
+                <button id="reviewNowSubmit" type="submit" name="reviewMode" value="now">Review Now</button>
+              </div>
             </form>
             <div class="panel">
               <div class="panel-header">

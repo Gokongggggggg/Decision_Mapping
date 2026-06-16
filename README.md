@@ -8,7 +8,7 @@ The core question:
 
 ## Status
 
-This project is currently an MVP.
+This project is currently an MVP v0.2.
 
 It is intentionally simple, local-first, and built for fast iteration. The product, UX, scoring logic, and data model will continue to change as the idea is tested and refined.
 
@@ -16,11 +16,11 @@ It is intentionally simple, local-first, and built for fast iteration. The produ
 
 - Opportunity-first entry screen
 - Goal planning
-- Action plans attached to goals
-- Supporting commitments attached to goals
+- Commitments attached to goals
 - Weekly capacity tracking
+- Review Later / Review Now opportunity workflow
 - Opportunity inbox
-- Opportunity cost simulation
+- Opportunity review engine
 - Rule-based recommendation: Accept, Defer, or Reject
 - Opportunity editing
 - Local data persistence with `localStorage`
@@ -51,7 +51,7 @@ No build step or backend is required for the current MVP.
 
 ## Roadmap Ideas
 
-- Edit flow for goals, action plans, and commitments
+- Edit flow for goals and commitments
 - Better opportunity comparison
 - Decision history and decision journal
 - Export decision summary

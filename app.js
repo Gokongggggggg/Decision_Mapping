@@ -20,34 +20,39 @@ const seedState = {
       status: "active"
     }
   ],
-  initiatives: [
+  initiatives: [],
+  commitments: [
     {
-      id: "initiative_cpts",
+      id: "commitment_cpts",
       goalId: "goal_security_intern",
       name: "CPTS",
-      estimatedWeeklyHours: 10,
-      estimatedDurationWeeks: 20,
-      status: "in_progress",
-      progress: 35
+      weeklyHours: 10,
+      priority: 10,
+      startDate: "",
+      endDate: "",
+      status: "active",
+      notes: "Certification preparation"
     },
     {
-      id: "initiative_htb",
+      id: "commitment_htb",
       goalId: "goal_security_intern",
       name: "HTB Machines",
-      estimatedWeeklyHours: 5,
-      estimatedDurationWeeks: 16,
-      status: "in_progress",
-      progress: 20
-    }
-  ],
-  commitments: [
+      weeklyHours: 5,
+      priority: 9,
+      startDate: "",
+      endDate: "",
+      status: "active",
+      notes: "Practical security training"
+    },
     {
       id: "commitment_university",
       goalId: "",
       name: "University",
       weeklyHours: 20,
-      energyCost: "high",
-      type: "fixed",
+      priority: 8,
+      startDate: "",
+      endDate: "",
+      status: "active",
       notes: ""
     },
     {
@@ -55,8 +60,10 @@ const seedState = {
       goalId: "goal_security_intern",
       name: "Gym",
       weeklyHours: 4,
-      energyCost: "medium",
-      type: "flexible",
+      priority: 5,
+      startDate: "",
+      endDate: "",
+      status: "active",
       notes: ""
     }
   ],
@@ -70,11 +77,11 @@ const seedState = {
       durationWeeks: 10,
       moneyCost: 0,
       currency: "IDR",
-      urgency: "medium",
+      deadline: "",
+      notes: "Example opportunity",
       alignmentScore: 6,
       expectedImpact: ["Product Thinking", "Network", "Certificate"],
-      relatedGoalId: "goal_security_intern",
-      status: "inbox"
+      status: "pending_review"
     }
   ]
 };
@@ -86,10 +93,36 @@ function loadState() {
   if (!stored) return structuredClone(seedState);
 
   try {
-    return { ...structuredClone(seedState), ...JSON.parse(stored) };
+    return migrateState({ ...structuredClone(seedState), ...JSON.parse(stored) });
   } catch {
     return structuredClone(seedState);
   }
+}
+
+function migrateState(nextState) {
+  const migratedCommitments = [...(nextState.commitments || [])];
+  const existingNames = new Set(migratedCommitments.map((item) => item.name));
+
+  (nextState.initiatives || []).forEach((item) => {
+    if (existingNames.has(item.name)) return;
+    migratedCommitments.push({
+      id: `commitment_${item.id}`,
+      goalId: item.goalId || "",
+      name: item.name,
+      weeklyHours: Number(item.estimatedWeeklyHours || 0),
+      priority: Number(goalByIdFrom(nextState, item.goalId)?.priority || 5),
+      startDate: "",
+      endDate: "",
+      status: item.status === "completed" ? "completed" : "active",
+      notes: "Migrated from action plan"
+    });
+  });
+
+  return { ...nextState, initiatives: [], commitments: migratedCommitments };
+}
+
+function goalByIdFrom(nextState, id) {
+  return (nextState.goals || []).find((goal) => goal.id === id);
 }
 
 function saveState() {
@@ -124,20 +157,19 @@ function splitList(value) {
     .filter(Boolean);
 }
 
-function activeInitiatives() {
-  return state.initiatives.filter((item) => item.status !== "completed");
+function activeCommitments() {
+  return state.commitments.filter((item) => item.status === "active" || !item.status);
 }
 
 function capacityStats(extraHours = 0) {
-  const initiativeHours = activeInitiatives().reduce((sum, item) => sum + Number(item.estimatedWeeklyHours || 0), 0);
-  const commitmentHours = state.commitments.reduce((sum, item) => sum + Number(item.weeklyHours || 0), 0);
-  const allocated = initiativeHours + commitmentHours;
+  const commitmentHours = activeCommitments().reduce((sum, item) => sum + Number(item.weeklyHours || 0), 0);
+  const allocated = commitmentHours;
   const capacity = Number(state.weeklyCapacity || 0);
   const remaining = capacity - allocated;
   const projected = allocated + Number(extraHours || 0);
   const utilization = capacity > 0 ? Math.round((allocated / capacity) * 100) : 0;
   const projectedUtilization = capacity > 0 ? Math.round((projected / capacity) * 100) : 0;
-  return { initiativeHours, commitmentHours, allocated, capacity, remaining, utilization, projected, projectedUtilization };
+  return { commitmentHours, allocated, capacity, remaining, utilization, projected, projectedUtilization };
 }
 
 function goalById(id) {
@@ -157,6 +189,7 @@ function render() {
   renderSelects();
   renderOpportunityFormState();
   renderGoals();
+  renderDashboardSections();
   renderOpportunities();
   renderEvaluation();
 }
@@ -167,16 +200,16 @@ function renderCapacity() {
   $("#allocatedHours").textContent = hours(stats.allocated);
   $("#remainingHours").textContent = hours(stats.remaining);
   $("#utilization").textContent = `${stats.utilization}%`;
-  $("#inboxCount").textContent = state.opportunities.filter((item) => item.status === "inbox").length;
+  $("#inboxCount").textContent = state.opportunities.filter((item) => item.status === "pending_review").length;
   $("#loadLabel").textContent = `${hours(stats.allocated)} / ${hours(stats.capacity)}`;
   $("#loadBar").style.width = `${Math.min(stats.utilization, 130)}%`;
-  $("#allocatedHint").textContent = `${hours(stats.initiativeHours)} action plans + ${hours(stats.commitmentHours)} commitments`;
+  $("#allocatedHint").textContent = `${hours(stats.commitmentHours)} active commitments`;
 
   const warning = $("#capacityWarning");
   warning.className = "notice";
   if (stats.allocated === 0) {
     warning.classList.add("neutral");
-    warning.textContent = "Add goals, action plans, and commitments to see your focus load.";
+    warning.textContent = "Add goals and commitments to see your focus load.";
   } else if (stats.remaining < 0) {
     warning.classList.add("danger");
     warning.textContent = `Overloaded by ${hours(Math.abs(stats.remaining))}. Any new yes needs an explicit no.`;
@@ -197,9 +230,7 @@ function renderSelects() {
     .map((goal) => `<option value="${goal.id}">${escapeHtml(goal.name)}</option>`)
     .join("");
   const fallback = `<option value="">Create a goal first</option>`;
-  document.querySelector('#initiativeForm [name="goalId"]').innerHTML = goalOptions || fallback;
   document.querySelector('#commitmentForm [name="goalId"]').innerHTML = `<option value="">General commitment</option>${goalOptions}`;
-  document.querySelector('#opportunityForm [name="relatedGoalId"]').innerHTML = `<option value="">No related goal</option>${goalOptions}`;
 }
 
 function renderGoals() {
@@ -227,10 +258,8 @@ function renderGoalSummary(goal) {
 
 function renderGoal(goal) {
   const metrics = (goal.successMetrics || []).map((metric) => `<span class="tag">${escapeHtml(metric)}</span>`).join("");
-  const goalInitiatives = state.initiatives.filter((item) => item.goalId === goal.id);
   const goalCommitments = state.commitments.filter((item) => item.goalId === goal.id);
-  const initiativeList = goalInitiatives.map(renderInitiativeRow).join("") || `<div class="empty compact">No action plans yet.</div>`;
-  const commitmentList = goalCommitments.map(renderCommitmentRow).join("") || `<div class="empty compact">No supporting commitments yet.</div>`;
+  const commitmentList = goalCommitments.map(renderCommitmentRow).join("") || `<div class="empty compact">No commitments yet.</div>`;
   return `
     <div class="entity">
       <div class="entity-top">
@@ -249,28 +278,9 @@ function renderGoal(goal) {
       </div>
       <div class="goal-detail-grid">
         <div>
-          <h5>Action Plans</h5>
-          <div class="mini-list">${initiativeList}</div>
-        </div>
-        <div>
           <h5>Commitments</h5>
           <div class="mini-list">${commitmentList}</div>
         </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderInitiativeRow(item) {
-  return `
-    <div class="mini-item">
-      <div>
-        <strong>${escapeHtml(item.name)}</strong>
-        <span>${hours(item.estimatedWeeklyHours)}/week - ${item.progress || 0}% - ${escapeHtml(item.status)}</span>
-      </div>
-      <div class="entity-actions">
-        <button data-toggle-initiative="${item.id}">${item.status === "completed" ? "Reopen" : "Complete"}</button>
-        <button class="danger-action" data-delete-initiative="${item.id}">Delete</button>
       </div>
     </div>
   `;
@@ -281,7 +291,7 @@ function renderCommitmentRow(item) {
     <div class="mini-item">
       <div>
         <strong>${escapeHtml(item.name)}</strong>
-        <span>${hours(item.weeklyHours)}/week - ${escapeHtml(item.energyCost)} energy - ${escapeHtml(item.type)}</span>
+        <span>${hours(item.weeklyHours)}/week - Priority ${item.priority || 5} - ${escapeHtml(item.status || "active")}</span>
       </div>
       <div class="entity-actions">
         <button class="danger-action" data-delete-commitment="${item.id}">Delete</button>
@@ -290,11 +300,24 @@ function renderCommitmentRow(item) {
   `;
 }
 
+function renderDashboardSections() {
+  const pending = state.opportunities.filter((item) => item.status === "pending_review");
+  const decided = state.opportunities.filter((item) => ["accepted", "rejected", "deferred"].includes(item.status)).slice(-5).reverse();
+
+  $("#decisionQueue").innerHTML = pending
+    .map((item) => `<div class="entity"><strong>${escapeHtml(item.title)}</strong><div class="entity-meta"><span class="tag amber">Pending Review</span><span class="tag">${hours(item.weeklyHours)}/week</span></div></div>`)
+    .join("") || empty("No pending reviews.");
+
+  $("#recentDecisions").innerHTML = decided
+    .map((item) => `<div class="entity"><strong>${escapeHtml(item.title)}</strong><div class="entity-meta"><span class="tag ${recommendationClass(statusLabel(item.status))}">${statusLabel(item.status)}</span></div></div>`)
+    .join("") || empty("No decisions yet.");
+}
+
 function renderOpportunities() {
   $("#opportunityCount").textContent = `${state.opportunities.length} opportunities`;
   $("#opportunitiesList").innerHTML = state.opportunities.map((item) => {
     const evaluation = evaluateOpportunity(item);
-    const selected = state.selectedOpportunityId === item.id ? "Selected" : "Evaluate";
+    const selected = state.selectedOpportunityId === item.id ? "Reviewing" : "Review Now";
     return `
       <div class="entity">
         <div class="entity-top">
@@ -318,7 +341,7 @@ function renderOpportunities() {
           <span class="tag blue">${item.durationWeeks} weeks</span>
           <span class="tag green">Alignment ${item.alignmentScore}/10</span>
           <span class="tag ${recommendationClass(evaluation.recommendation)}">${evaluation.recommendation}</span>
-          <span class="tag">${escapeHtml(item.status)}</span>
+          <span class="tag">${statusLabel(item.status)}</span>
         </div>
       </div>
     `;
@@ -329,10 +352,8 @@ function evaluateOpportunity(opportunity) {
   const stats = capacityStats(opportunity.weeklyHours);
   const overflow = Math.max(0, Number(opportunity.weeklyHours || 0) - stats.remaining);
   const alignment = Number(opportunity.alignmentScore || 0);
-  const relatedGoal = goalById(opportunity.relatedGoalId);
-  const focusDrift = relatedGoal
-    ? relatedGoal.priority >= 8 ? "Low" : "Medium"
-    : "High";
+  const topGoalPriority = Math.max(...state.goals.map((goal) => Number(goal.priority || 0)), 0);
+  const focusDrift = alignment >= 8 ? "Low" : alignment >= 5 ? "Medium" : "High";
   const capacityImpact = overflow === 0 ? "Low" : overflow <= 3 ? "Medium" : "High";
 
   let recommendation = "Defer";
@@ -341,22 +362,23 @@ function evaluateOpportunity(opportunity) {
   if (alignment <= 4 && capacityImpact !== "Low") recommendation = "Reject";
 
   const tradeoffs = findTradeoffs(opportunity, overflow);
-  return { stats, overflow, alignment, relatedGoal, focusDrift, capacityImpact, recommendation, tradeoffs };
+  const affectedGoals = [...new Set(tradeoffs.map((item) => item.goalId).filter(Boolean))]
+    .map((goalId) => goalById(goalId))
+    .filter(Boolean);
+  const goalImpact = overflow === 0 ? "Low" : tradeoffs.some((item) => Number(item.priority || 0) >= topGoalPriority) ? "High" : "Medium";
+  return { stats, overflow, alignment, focusDrift, capacityImpact, recommendation, tradeoffs, affectedGoals, goalImpact };
 }
 
 function findTradeoffs(opportunity, overflow) {
   if (overflow <= 0) return [];
 
-  const relatedGoalId = opportunity.relatedGoalId;
-  return activeInitiatives()
-    .map((initiative) => ({ ...initiative, goal: goalById(initiative.goalId) }))
-    .filter((initiative) => initiative.goalId !== relatedGoalId)
-    .sort((a, b) => Number(a.goal?.priority || 0) - Number(b.goal?.priority || 0))
+  return activeCommitments()
+    .sort((a, b) => Number(a.priority || 0) - Number(b.priority || 0))
     .slice(0, 3);
 }
 
 function renderEvaluation() {
-  const selected = state.opportunities.find((item) => item.id === state.selectedOpportunityId) || state.opportunities[0];
+  const selected = state.opportunities.find((item) => item.id === state.selectedOpportunityId);
   const output = $("#evaluationOutput");
   if (!selected) {
     output.className = "evaluation-empty";
@@ -369,14 +391,17 @@ function renderEvaluation() {
   $("#selectedOpportunityLabel").textContent = selected.title;
   const evaluation = evaluateOpportunity(selected);
   const commitmentLoad = state.commitments
-    .map((item) => `<li>${escapeHtml(item.name)}: ${hours(item.weeklyHours)}/week, ${escapeHtml(item.type)}</li>`)
+    .map((item) => `<li>${escapeHtml(item.name)}: ${hours(item.weeklyHours)}/week, priority ${item.priority || 5}, ${escapeHtml(item.status || "active")}</li>`)
     .join("");
   const impacts = selected.expectedImpact?.length
     ? selected.expectedImpact.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
     : "<li>No explicit benefits entered yet.</li>";
   const tradeoffs = evaluation.tradeoffs.length
-    ? evaluation.tradeoffs.map((item) => `<li>${escapeHtml(item.name)} may lose up to ${hours(Math.min(item.estimatedWeeklyHours, evaluation.overflow))}/week</li>`).join("")
+    ? evaluation.tradeoffs.map((item) => `<li>${escapeHtml(item.name)} may lose up to ${hours(Math.min(item.weeklyHours, evaluation.overflow))}/week because remaining capacity is insufficient.</li>`).join("")
     : "<li>No delay predicted from current capacity.</li>";
+  const affectedGoals = evaluation.affectedGoals.length
+    ? evaluation.affectedGoals.map((goal) => `<li>${escapeHtml(goal.name)} - predicted impact ${evaluation.goalImpact}</li>`).join("")
+    : "<li>No directly affected goal detected.</li>";
 
   output.className = "evaluation-card";
   output.innerHTML = `
@@ -396,6 +421,7 @@ function renderEvaluation() {
       <div class="eval-stat"><span>After Accept</span><strong>${hours(evaluation.stats.projected)} / ${hours(evaluation.stats.capacity)}</strong></div>
       <div class="eval-stat"><span>Projected Use</span><strong>${evaluation.stats.projectedUtilization}%</strong></div>
       <div class="eval-stat"><span>Overflow</span><strong>${hours(evaluation.overflow)}</strong></div>
+      <div class="eval-stat"><span>Goal Impact</span><strong>${evaluation.goalImpact}</strong></div>
     </div>
     <div class="two-col">
       <div>
@@ -403,9 +429,13 @@ function renderEvaluation() {
         <ul class="tradeoff-list">${impacts}</ul>
       </div>
       <div>
-        <h4>Likely delayed</h4>
+        <h4>Affected commitments</h4>
         <ul class="tradeoff-list">${tradeoffs}</ul>
       </div>
+    </div>
+    <div class="benchmark-block">
+      <h4>Goal impact</h4>
+      <ul class="tradeoff-list">${affectedGoals}</ul>
     </div>
     <div class="benchmark-block">
       <h4>Current commitments benchmark</h4>
@@ -415,9 +445,20 @@ function renderEvaluation() {
 }
 
 function recommendationClass(value) {
-  if (value === "Accept") return "green";
-  if (value === "Reject") return "red";
+  if (value === "Accept" || value === "Accepted") return "green";
+  if (value === "Reject" || value === "Rejected") return "red";
   return "amber";
+}
+
+function statusLabel(value) {
+  const labels = {
+    pending_review: "Pending Review",
+    accepted: "Accepted",
+    rejected: "Rejected",
+    deferred: "Deferred",
+    inbox: "Pending Review"
+  };
+  return labels[value] || value || "Pending Review";
 }
 
 function empty(text) {
@@ -450,10 +491,10 @@ function opportunityFromData(data, existing = {}) {
     durationWeeks: Number(data.durationWeeks),
     moneyCost: Number(data.moneyCost),
     currency: data.currency,
-    urgency: data.urgency,
+    deadline: data.deadline,
+    notes: data.notes,
     alignmentScore: Number(data.alignmentScore),
-    expectedImpact: splitList(data.expectedImpact || ""),
-    relatedGoalId: data.relatedGoalId
+    expectedImpact: splitList(data.expectedImpact || "")
   };
 }
 
@@ -462,13 +503,13 @@ function fillOpportunityForm(opportunity) {
   form.elements.title.value = opportunity.title || "";
   form.elements.description.value = opportunity.description || "";
   form.elements.category.value = opportunity.category || "academy";
-  form.elements.urgency.value = opportunity.urgency || "medium";
   form.elements.weeklyHours.value = opportunity.weeklyHours ?? 4;
   form.elements.durationWeeks.value = opportunity.durationWeeks ?? 4;
   form.elements.currency.value = opportunity.currency || "IDR";
   form.elements.moneyCost.value = opportunity.moneyCost ?? 0;
+  form.elements.deadline.value = opportunity.deadline || "";
   form.elements.alignmentScore.value = opportunity.alignmentScore ?? 6;
-  form.elements.relatedGoalId.value = opportunity.relatedGoalId || "";
+  form.elements.notes.value = opportunity.notes || "";
   form.elements.expectedImpact.value = (opportunity.expectedImpact || []).join(", ");
 }
 
@@ -481,7 +522,8 @@ function resetOpportunityForm() {
 function renderOpportunityFormState() {
   const isEditing = Boolean(state.editingOpportunityId);
   $("#opportunityFormTitle").textContent = isEditing ? "Edit Opportunity" : "Add Opportunity";
-  $("#opportunitySubmit").textContent = isEditing ? "Update Opportunity" : "Add Opportunity";
+  $("#reviewLaterSubmit").textContent = isEditing ? "Update Later" : "Review Later";
+  $("#reviewNowSubmit").textContent = isEditing ? "Update & Review" : "Review Now";
   $("#cancelOpportunityEdit").classList.toggle("hidden", !isEditing);
 }
 
@@ -513,21 +555,6 @@ $("#goalForm").addEventListener("submit", (event) => {
   });
 });
 
-$("#initiativeForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  addFromForm(event.currentTarget, (data) => {
-    state.initiatives.push({
-      id: makeId(),
-      name: data.name,
-      goalId: data.goalId,
-      estimatedWeeklyHours: Number(data.estimatedWeeklyHours),
-      estimatedDurationWeeks: Number(data.estimatedDurationWeeks),
-      progress: Number(data.progress),
-      status: "in_progress"
-    });
-  });
-});
-
 $("#commitmentForm").addEventListener("submit", (event) => {
   event.preventDefault();
   addFromForm(event.currentTarget, (data) => {
@@ -536,8 +563,10 @@ $("#commitmentForm").addEventListener("submit", (event) => {
       goalId: data.goalId,
       name: data.name,
       weeklyHours: Number(data.weeklyHours),
-      energyCost: data.energyCost,
-      type: data.type,
+      priority: Number(data.priority),
+      startDate: data.startDate,
+      endDate: data.endDate,
+      status: data.status,
       notes: data.notes
     });
   });
@@ -548,21 +577,23 @@ $("#opportunityForm").addEventListener("submit", (event) => {
 
   const form = event.currentTarget;
   const data = Object.fromEntries(new FormData(form).entries());
+  const reviewMode = event.submitter?.value || "later";
 
   if (state.editingOpportunityId) {
     const opportunity = state.opportunities.find((item) => item.id === state.editingOpportunityId);
     if (opportunity) {
       Object.assign(opportunity, opportunityFromData(data, opportunity));
+      if (reviewMode === "now") opportunity.status = "pending_review";
       state.selectedOpportunityId = opportunity.id;
     }
     state.editingOpportunityId = null;
   } else {
     const opportunity = opportunityFromData(data, {
       id: makeId(),
-      status: "inbox"
+      status: "pending_review"
     });
     state.opportunities.push(opportunity);
-    state.selectedOpportunityId = opportunity.id;
+    if (reviewMode === "now") state.selectedOpportunityId = opportunity.id;
   }
 
   form.reset();
@@ -590,6 +621,7 @@ document.addEventListener("click", (event) => {
   if (deleteGoal) {
     state.goals = state.goals.filter((item) => item.id !== deleteGoal);
     state.initiatives = state.initiatives.filter((item) => item.goalId !== deleteGoal);
+    state.commitments = state.commitments.map((item) => item.goalId === deleteGoal ? { ...item, goalId: "" } : item);
   }
 
   if (deleteInitiative) state.initiatives = state.initiatives.filter((item) => item.id !== deleteInitiative);
