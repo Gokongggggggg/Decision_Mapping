@@ -21,6 +21,7 @@ It is intentionally simple, local-first, and built for fast iteration. The produ
 - Review Later / Review Now opportunity workflow
 - Opportunity inbox
 - Opportunity review engine
+- Flexible opportunity duration units
 - Rule-based recommendation: Accept, Defer, or Reject
 - Opportunity editing
 - Local data persistence with `localStorage`

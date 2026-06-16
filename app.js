@@ -74,7 +74,8 @@ const seedState = {
       description: "Product management academy program.",
       category: "academy",
       weeklyHours: 8,
-      durationWeeks: 10,
+      durationAmount: 10,
+      durationUnit: "week",
       moneyCost: 0,
       currency: "IDR",
       deadline: "",
@@ -139,6 +140,12 @@ function $all(selector) {
 
 function hours(value) {
   return `${Number(value || 0).toFixed(Number(value || 0) % 1 === 0 ? 0 : 1)}h`;
+}
+
+function durationLabel(opportunity) {
+  const amount = Number(opportunity.durationAmount || opportunity.durationWeeks || 1);
+  const unit = opportunity.durationUnit || "week";
+  return `${amount} ${unit}${amount === 1 ? "" : "s"}`;
 }
 
 function money(value, currency = "IDR") {
@@ -338,7 +345,7 @@ function renderOpportunities() {
           <span class="tag">${escapeHtml(item.category)}</span>
           <span class="tag">${hours(item.weeklyHours)}/week</span>
           <span class="tag">${money(item.moneyCost, item.currency || "IDR")}</span>
-          <span class="tag blue">${item.durationWeeks} weeks</span>
+          <span class="tag blue">${durationLabel(item)}</span>
           <span class="tag green">Alignment ${item.alignmentScore}/10</span>
           <span class="tag ${recommendationClass(evaluation.recommendation)}">${evaluation.recommendation}</span>
           <span class="tag">${statusLabel(item.status)}</span>
@@ -402,6 +409,8 @@ function renderEvaluation() {
   const affectedGoals = evaluation.affectedGoals.length
     ? evaluation.affectedGoals.map((goal) => `<li>${escapeHtml(goal.name)} - predicted impact ${evaluation.goalImpact}</li>`).join("")
     : "<li>No directly affected goal detected.</li>";
+  const dangerClass = evaluation.overflow > 0 ? "impact-danger" : "";
+  const affectedListClass = evaluation.overflow > 0 ? "tradeoff-list impact-list" : "tradeoff-list";
 
   output.className = "evaluation-card";
   output.innerHTML = `
@@ -418,10 +427,10 @@ function renderEvaluation() {
       <div class="eval-stat"><span>Focus Drift</span><strong>${evaluation.focusDrift}</strong></div>
       <div class="eval-stat"><span>Money Cost</span><strong>${money(selected.moneyCost, selected.currency || "IDR")}</strong></div>
       <div class="eval-stat"><span>Current Load</span><strong>${hours(evaluation.stats.allocated)} / ${hours(evaluation.stats.capacity)}</strong></div>
-      <div class="eval-stat"><span>After Accept</span><strong>${hours(evaluation.stats.projected)} / ${hours(evaluation.stats.capacity)}</strong></div>
-      <div class="eval-stat"><span>Projected Use</span><strong>${evaluation.stats.projectedUtilization}%</strong></div>
-      <div class="eval-stat"><span>Overflow</span><strong>${hours(evaluation.overflow)}</strong></div>
-      <div class="eval-stat"><span>Goal Impact</span><strong>${evaluation.goalImpact}</strong></div>
+      <div class="eval-stat ${dangerClass}"><span>After Accept</span><strong>${hours(evaluation.stats.projected)} / ${hours(evaluation.stats.capacity)}</strong></div>
+      <div class="eval-stat ${dangerClass}"><span>Projected Use</span><strong>${evaluation.stats.projectedUtilization}%</strong></div>
+      <div class="eval-stat ${dangerClass}"><span>Overflow</span><strong>${hours(evaluation.overflow)}</strong></div>
+      <div class="eval-stat ${dangerClass}"><span>Goal Impact</span><strong>${evaluation.goalImpact}</strong></div>
     </div>
     <div class="two-col">
       <div>
@@ -430,12 +439,12 @@ function renderEvaluation() {
       </div>
       <div>
         <h4>Affected commitments</h4>
-        <ul class="tradeoff-list">${tradeoffs}</ul>
+        <ul class="${affectedListClass}">${tradeoffs}</ul>
       </div>
     </div>
-    <div class="benchmark-block">
+    <div class="benchmark-block ${evaluation.overflow > 0 ? "impact-card" : ""}">
       <h4>Goal impact</h4>
-      <ul class="tradeoff-list">${affectedGoals}</ul>
+      <ul class="${affectedListClass}">${affectedGoals}</ul>
     </div>
     <div class="benchmark-block">
       <h4>Current commitments benchmark</h4>
@@ -488,7 +497,8 @@ function opportunityFromData(data, existing = {}) {
     description: data.description,
     category: data.category,
     weeklyHours: Number(data.weeklyHours),
-    durationWeeks: Number(data.durationWeeks),
+    durationAmount: Number(data.durationAmount),
+    durationUnit: data.durationUnit,
     moneyCost: Number(data.moneyCost),
     currency: data.currency,
     deadline: data.deadline,
@@ -504,7 +514,8 @@ function fillOpportunityForm(opportunity) {
   form.elements.description.value = opportunity.description || "";
   form.elements.category.value = opportunity.category || "academy";
   form.elements.weeklyHours.value = opportunity.weeklyHours ?? 4;
-  form.elements.durationWeeks.value = opportunity.durationWeeks ?? 4;
+  form.elements.durationAmount.value = opportunity.durationAmount ?? opportunity.durationWeeks ?? 1;
+  form.elements.durationUnit.value = opportunity.durationUnit || "week";
   form.elements.currency.value = opportunity.currency || "IDR";
   form.elements.moneyCost.value = opportunity.moneyCost ?? 0;
   form.elements.deadline.value = opportunity.deadline || "";

@@ -83,7 +83,7 @@ Fields:
 - Title
 - Description
 - Expected Weekly Hours
-- Duration
+- Duration, with flexible unit such as days, weeks, or months
 - Cost
 - Deadline
 - Notes

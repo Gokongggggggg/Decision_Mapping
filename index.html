@@ -189,8 +189,15 @@
                 <label>Weekly hours
                   <input name="weeklyHours" type="number" min="0" step="0.5" value="4" required />
                 </label>
-                <label>Duration weeks
-                  <input name="durationWeeks" type="number" min="1" step="1" value="4" required />
+                <label>Duration
+                  <div class="duration-input">
+                    <input name="durationAmount" type="number" min="1" step="1" value="1" required />
+                    <select name="durationUnit" aria-label="Duration unit">
+                      <option value="day">Day(s)</option>
+                      <option value="week" selected>Week(s)</option>
+                      <option value="month">Month(s)</option>
+                    </select>
+                  </div>
                 </label>
               </div>
               <div class="two-col">
