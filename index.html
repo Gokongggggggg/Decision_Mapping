@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opportunity OS</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">O</div>
+          <div>
+            <p class="eyebrow">Opportunity OS</p>
+            <h1>Decision Console</h1>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Primary">
+          <button class="nav-item active" data-view="dashboard">Dashboard</button>
+          <button class="nav-item" data-view="goals">Goals</button>
+          <button class="nav-item" data-view="commitments">Commitments</button>
+          <button class="nav-item" data-view="opportunities">Opportunities</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <section class="topbar">
+          <div>
+            <p class="eyebrow">MVP v0.1</p>
+            <h2 id="viewTitle">Dashboard</h2>
+          </div>
+          <div class="topbar-actions">
+            <label class="capacity-control" for="weeklyCapacity" data-tooltip="Total realistic hours you can spend on goals, initiatives, commitments, and new opportunities each week.">
+              <span>Weekly Capacity</span>
+              <div class="capacity-input">
+                <input id="weeklyCapacity" type="number" min="1" max="168" step="1" />
+                <span>h</span>
+              </div>
+            </label>
+            <div class="decision-pill" id="globalStatus" data-tooltip="Your current load status based on allocated hours versus weekly capacity.">Ready</div>
+          </div>
+        </section>
+
+        <section class="view active" id="dashboardView">
+          <div class="metrics-grid">
+            <article class="metric" data-tooltip="Hours already allocated to action plans and recurring commitments.">
+              <span>Allocated</span>
+              <strong id="allocatedHours">0h</strong>
+              <small id="allocatedHint">No active allocation yet</small>
+            </article>
+            <article class="metric" data-tooltip="Capacity left before adding a new opportunity.">
+              <span>Remaining</span>
+              <strong id="remainingHours">0h</strong>
+              <small>Available this week</small>
+            </article>
+            <article class="metric" data-tooltip="How full your week is. Above 85% is intentionally treated as tight.">
+              <span>Utilization</span>
+              <strong id="utilization">0%</strong>
+              <small id="utilizationHint">Capacity is open</small>
+            </article>
+            <article class="metric" data-tooltip="Opportunities waiting for accept, reject, or defer decisions.">
+              <span>Inbox</span>
+              <strong id="inboxCount">0</strong>
+              <small>Opportunities pending</small>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <h3>Capacity Load</h3>
+                <span id="loadLabel">0 / 0h</span>
+              </div>
+              <div class="load-track">
+                <div id="loadBar" class="load-bar"></div>
+              </div>
+              <div id="capacityWarning" class="notice neutral">Add goals, action plans, and commitments to see your focus load.</div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h3>Priority Goals</h3>
+                <button class="text-button" data-jump="goals">Manage</button>
+              </div>
+              <div id="goalSummary" class="summary-list"></div>
+            </section>
+
+            <section class="panel wide">
+              <div class="panel-header">
+                <h3>Opportunity Evaluation</h3>
+                <button class="text-button" data-jump="opportunities">Open Inbox</button>
+              </div>
+              <div id="evaluationOutput" class="evaluation-empty">Create or select an opportunity to see the cost of saying yes.</div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="goalsView">
+          <div class="goal-workspace">
+            <form id="goalForm" class="form-panel">
+              <h3>Add Goal</h3>
+              <input name="name" required placeholder="Goal name" />
+              <textarea name="description" placeholder="Description"></textarea>
+              <div class="two-col">
+                <label data-tooltip="Higher priority goals are protected more strongly in opportunity trade-off calculations.">Priority
+                  <input name="priority" type="number" min="1" max="10" value="8" required />
+                </label>
+                <label>Deadline
+                  <input name="deadline" type="date" />
+                </label>
+              </div>
+              <input name="successMetrics" placeholder="Success metrics, comma separated" data-tooltip="Use outcomes you can verify, for example Complete CPTS or Apply to 20 internships." />
+              <button type="submit">Add Goal</button>
+            </form>
+
+            <form id="initiativeForm" class="form-panel">
+              <h3>Add Action Plan</h3>
+              <input name="name" required placeholder="Action, initiative, or project name" />
+              <select name="goalId" required></select>
+              <div class="two-col">
+                <label data-tooltip="Recurring weekly time this action needs while active.">Weekly hours
+                  <input name="estimatedWeeklyHours" type="number" min="0" step="0.5" value="3" required />
+                </label>
+                <label>Duration weeks
+                  <input name="estimatedDurationWeeks" type="number" min="1" step="1" value="8" />
+                </label>
+              </div>
+              <label>Progress
+                <input name="progress" type="range" min="0" max="100" value="0" />
+              </label>
+              <button type="submit">Add Action Plan</button>
+            </form>
+
+            <form id="commitmentForm" class="form-panel">
+              <h3>Add Supporting Commitment</h3>
+              <input name="name" required placeholder="Activity name" />
+              <select name="goalId"></select>
+              <div class="two-col">
+                <label>Weekly hours
+                  <input name="weeklyHours" type="number" min="0" step="0.5" value="5" required />
+                </label>
+                <label data-tooltip="Energy cost is context for now and will later influence recommendation strength.">Energy cost
+                  <select name="energyCost">
+                    <option>low</option>
+                    <option selected>medium</option>
+                    <option>high</option>
+                  </select>
+                </label>
+              </div>
+              <label>Type
+                <select name="type">
+                  <option value="fixed">Fixed</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </label>
+              <textarea name="notes" placeholder="Notes"></textarea>
+              <button type="submit">Add Commitment</button>
+            </form>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3>Goal Plans</h3>
+                <span id="goalCount">0 active</span>
+              </div>
+              <div id="goalsList" class="entity-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="commitmentsView">
+          <div class="single-panel">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>Commitments</h3>
+                <span id="commitmentCount">0 active</span>
+              </div>
+              <div id="commitmentsList" class="entity-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="opportunitiesView">
+          <div class="work-grid opportunities-grid">
+            <form id="opportunityForm" class="form-panel">
+              <div class="form-header">
+                <h3 id="opportunityFormTitle">Add Opportunity</h3>
+                <button id="cancelOpportunityEdit" class="text-button hidden" type="button">Cancel</button>
+              </div>
+              <input name="title" required placeholder="Opportunity title" />
+              <textarea name="description" placeholder="Description"></textarea>
+              <div class="two-col">
+                <label>Category
+                  <select name="category">
+                    <option>internship</option>
+                    <option>academy</option>
+                    <option>competition</option>
+                    <option>certification</option>
+                    <option>startup idea</option>
+                    <option>networking</option>
+                  </select>
+                </label>
+                <label>Urgency
+                  <select name="urgency">
+                    <option>low</option>
+                    <option selected>medium</option>
+                    <option>high</option>
+                  </select>
+                </label>
+              </div>
+              <div class="two-col">
+                <label>Weekly hours
+                  <input name="weeklyHours" type="number" min="0" step="0.5" value="4" required />
+                </label>
+                <label>Duration weeks
+                  <input name="durationWeeks" type="number" min="1" step="1" value="4" required />
+                </label>
+              </div>
+              <div class="two-col">
+                <label data-tooltip="Direct cash cost of the opportunity, shown in evaluation so time and money are both visible.">Money cost
+                  <div class="money-input">
+                    <select name="currency" aria-label="Currency">
+                      <option value="IDR" selected>IDR</option>
+                      <option value="USD">USD</option>
+                      <option value="SGD">SGD</option>
+                      <option value="EUR">EUR</option>
+                    </select>
+                    <input name="moneyCost" type="number" min="0" step="1" value="0" />
+                  </div>
+                </label>
+                <label data-tooltip="Manual 1-10 score for how strongly this opportunity supports your current goals.">Alignment
+                  <input name="alignmentScore" type="number" min="1" max="10" value="6" required />
+                </label>
+              </div>
+              <select name="relatedGoalId"></select>
+              <input name="expectedImpact" placeholder="Expected impact, comma separated" />
+              <button id="opportunitySubmit" type="submit">Add Opportunity</button>
+            </form>
+            <div class="panel">
+              <div class="panel-header">
+                <h3>Inbox</h3>
+                <span id="opportunityCount">0 opportunities</span>
+              </div>
+              <div id="opportunitiesList" class="entity-list"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
