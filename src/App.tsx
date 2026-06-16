@@ -378,9 +378,9 @@ function LandingPage({ onOpenApp }: { onOpenApp: (view?: View) => void }) {
 
         <div className="surface-card float-panel reveal reveal-delay-1 rounded-[1.35rem] p-4">
           <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-2xl bg-[#121418] p-6 text-white shadow-xl shadow-zinc-950/12 ring-1 ring-white/8">
-              <p className="text-[11px] font-black uppercase tracking-wide text-zinc-400">Opportunity Review</p>
-              <h2 className="mt-3 text-4xl font-black tracking-tight">PM Academy</h2>
+            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-lg shadow-zinc-950/6">
+              <p className="text-[11px] font-black uppercase tracking-wide text-zinc-500">Opportunity Review</p>
+              <h2 className="mt-3 text-4xl font-black tracking-tight text-zinc-950">PM Academy</h2>
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <PreviewStat label="Current Load" value="35h / 40h" />
                 <PreviewStat label="After Accept" value="43h / 40h" danger />
@@ -923,11 +923,11 @@ function OpportunityMini({ opportunity }: { opportunity: Opportunity }) {
 }
 
 function PreviewStat({ label, value, danger, warn }: { label: string; value: string; danger?: boolean; warn?: boolean }) {
-  const accent = danger ? "border-l-rose-400/70" : warn ? "border-l-lime-400/65" : "border-l-zinc-500/70";
-  const valueTone = danger ? "text-rose-100" : warn ? "text-lime-100" : "text-white";
+  const accent = danger ? "border-l-rose-400" : warn ? "border-l-emerald-500" : "border-l-sky-400";
+  const valueTone = danger ? "text-rose-700" : warn ? "text-emerald-700" : "text-zinc-950";
 
   return (
-    <div className={`min-h-[96px] rounded-xl border border-white/10 border-l-2 bg-white/[0.055] px-4 py-3.5 ${accent}`}>
+    <div className={`min-h-[96px] rounded-xl border border-black/10 border-l-2 bg-zinc-50/80 px-4 py-3.5 shadow-sm ${accent}`}>
       <p className="text-[11px] font-black uppercase tracking-wide text-zinc-500">{label}</p>
       <strong className={`mt-3 block text-xl font-black tracking-tight ${valueTone}`}>{value}</strong>
     </div>
