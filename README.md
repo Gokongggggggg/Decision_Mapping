@@ -31,14 +31,19 @@ It is intentionally simple, local-first, and built for fast iteration. The produ
 
 ## How To Run
 
-Open `index.html` directly in a browser.
+Open `index.html` directly in a browser to view the landing page.
+
+Open `app.html` directly in a browser to use the MVP app.
 
 No build step or backend is required for the current MVP.
 
 ## Project Files
 
-- `index.html` - app structure
+- `index.html` - landing page
+- `app.html` - app structure
 - `styles.css` - UI styling
+- `landing.css` - landing page styling
+- `landing.js` - landing page interactive background
 - `app.js` - app state, rendering, calculations, and interactions
 - `PRD_Opportunity_OS.md` - product requirements document
 

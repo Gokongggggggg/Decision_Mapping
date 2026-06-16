@@ -3,261 +3,152 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Opportunity OS</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>Opportunity OS - Know the cost before saying yes</title>
+    <link rel="stylesheet" href="landing.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand">
-          <div class="brand-mark">O</div>
-          <div>
-            <p class="eyebrow">Opportunity OS</p>
-            <h1>Decision Console</h1>
+    <canvas id="decisionCanvas" aria-hidden="true"></canvas>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Opportunity OS home">
+        <span class="brand-mark">O</span>
+        <span>Opportunity OS</span>
+      </a>
+      <nav class="site-nav" aria-label="Landing navigation">
+        <a href="#review-engine">Review Engine</a>
+        <a href="#workflow">Workflow</a>
+        <a href="app.html">Open App</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">MVP v0.2</p>
+          <h1>Know the cost before saying yes.</h1>
+          <p class="hero-lede">
+            Opportunity OS helps you evaluate new opportunities against your goals, commitments, time cost, money cost, and current capacity.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="app.html">Open Opportunity OS</a>
+            <a class="secondary-action" href="#review-engine">See how it works</a>
+          </div>
+          <div class="trust-row" aria-label="Core product pillars">
+            <span>Goals</span>
+            <span>Commitments</span>
+            <span>Review Now</span>
+            <span>Trade-offs</span>
           </div>
         </div>
-        <nav class="nav" aria-label="Primary">
-          <button class="nav-item active" data-view="opportunities">Opportunities</button>
-          <button class="nav-item" data-view="dashboard">Dashboard</button>
-          <button class="nav-item" data-view="goals">Goals</button>
-        </nav>
-        <button id="loadDummyData" class="utility-button" type="button">Load Dummy Data</button>
-      </aside>
 
-      <main class="main">
-        <section class="topbar">
+        <div class="product-preview" aria-label="Opportunity OS product preview">
+          <div class="preview-topbar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="preview-grid">
+            <section class="preview-panel review-panel">
+              <div class="panel-label">Selected Opportunity</div>
+              <h2>PM Academy</h2>
+              <div class="preview-tags">
+                <span>8h per week</span>
+                <span>10 weeks</span>
+                <span>Pending Review</span>
+              </div>
+              <div class="impact-row danger">
+                <span>After Accept</span>
+                <strong>43h / 40h</strong>
+              </div>
+              <div class="impact-row danger">
+                <span>Overflow</span>
+                <strong>3h</strong>
+              </div>
+              <div class="recommendation">
+                <span>Recommendation</span>
+                <strong>Defer</strong>
+              </div>
+            </section>
+
+            <section class="preview-panel queue-panel">
+              <div class="panel-label">Decision Queue</div>
+              <div class="queue-item active">
+                <span>One-Day CTF</span>
+                <strong>9h total</strong>
+              </div>
+              <div class="queue-item">
+                <span>SMT Korea</span>
+                <strong>20h total</strong>
+              </div>
+              <div class="queue-item">
+                <span>Startup Idea</span>
+                <strong>30h / month</strong>
+              </div>
+            </section>
+
+            <section class="preview-panel capacity-panel">
+              <div class="panel-label">Capacity</div>
+              <div class="capacity-number">35h / 40h</div>
+              <div class="capacity-track">
+                <span></span>
+              </div>
+              <p>CPTS, HTB, University, Gym</p>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-band" id="review-engine">
+        <div class="section-heading">
+          <p class="eyebrow">Opportunity Review Engine</p>
+          <h2>Every review starts with your actual capacity.</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <span>01</span>
+            <h3>Capture the opportunity</h3>
+            <p>Add time cost, duration, money cost, deadline, notes, and expected gain.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Compare against commitments</h3>
+            <p>The system normalizes time units into weekly impact, then compares against your capacity.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>See what gets hit</h3>
+            <p>Affected commitments and goal impact are highlighted before you accept, defer, or reject.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="workflow" id="workflow">
+        <div class="workflow-copy">
+          <p class="eyebrow">Fast Workflow</p>
+          <h2>Review later when you are collecting. Review now when the decision matters.</h2>
+        </div>
+        <div class="workflow-steps">
           <div>
-            <p class="eyebrow">MVP v0.2</p>
-            <h2 id="viewTitle">Opportunities</h2>
+            <strong>Review Later</strong>
+            <span>Save the opportunity into the decision queue with no analysis yet.</span>
           </div>
-          <div class="topbar-actions">
-            <label class="capacity-control" for="weeklyCapacity" data-tooltip="Total realistic hours you can spend on goals, commitments, and new opportunities each week.">
-              <span>Weekly Capacity</span>
-              <div class="capacity-input">
-                <input id="weeklyCapacity" type="number" min="1" max="168" step="1" />
-                <span>h</span>
-              </div>
-            </label>
-            <div class="decision-pill" id="globalStatus" data-tooltip="Your current load status based on allocated hours versus weekly capacity.">Ready</div>
+          <div>
+            <strong>Review Now</strong>
+            <span>Open impact analysis immediately and inspect overflow, affected commitments, and goal drift.</span>
           </div>
-        </section>
-
-        <section class="view" id="dashboardView">
-          <div class="metrics-grid">
-            <article class="metric" data-tooltip="Weekly impact already allocated to active commitments.">
-              <span>Allocated</span>
-              <strong id="allocatedHours">0h</strong>
-              <small id="allocatedHint">No active allocation yet</small>
-            </article>
-            <article class="metric" data-tooltip="Capacity left before adding a new opportunity.">
-              <span>Remaining</span>
-              <strong id="remainingHours">0h</strong>
-              <small>Available this week</small>
-            </article>
-            <article class="metric" data-tooltip="How full your week is. Above 85% is intentionally treated as tight.">
-              <span>Utilization</span>
-              <strong id="utilization">0%</strong>
-              <small id="utilizationHint">Capacity is open</small>
-            </article>
-            <article class="metric" data-tooltip="Opportunities waiting for accept, reject, or defer decisions.">
-              <span>Inbox</span>
-              <strong id="inboxCount">0</strong>
-              <small>Opportunities pending</small>
-            </article>
+          <div>
+            <strong>Decide</strong>
+            <span>Accept, reject, or defer with the trade-off visible.</span>
           </div>
+        </div>
+      </section>
+    </main>
 
-          <div class="dashboard-grid">
-            <section class="panel">
-              <div class="panel-header">
-                <h3>Capacity Load</h3>
-                <span id="loadLabel">0 / 0h</span>
-              </div>
-              <div class="load-track">
-                <div id="loadBar" class="load-bar"></div>
-              </div>
-              <div id="capacityWarning" class="notice neutral">Add goals and commitments to see your focus load.</div>
-            </section>
+    <footer class="site-footer">
+      <span>Opportunity OS is an MVP and will keep iterating.</span>
+      <a href="app.html">Launch app</a>
+    </footer>
 
-            <section class="panel">
-              <div class="panel-header">
-                <h3>Current Focus</h3>
-                <button class="text-button" data-jump="goals">Manage</button>
-              </div>
-              <div id="goalSummary" class="summary-list"></div>
-            </section>
-
-            <section class="panel">
-              <div class="panel-header">
-                <h3>Decision Queue</h3>
-                <button class="text-button" data-jump="opportunities">Review</button>
-              </div>
-              <div id="decisionQueue" class="summary-list"></div>
-            </section>
-
-            <section class="panel">
-              <div class="panel-header">
-                <h3>Recent Decisions</h3>
-              </div>
-              <div id="recentDecisions" class="summary-list"></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="view" id="goalsView">
-          <div class="goal-workspace">
-            <form id="goalForm" class="form-panel">
-              <h3>Add Goal</h3>
-              <input name="name" required placeholder="Goal name" />
-              <textarea name="description" placeholder="Description"></textarea>
-              <div class="two-col">
-                <label data-tooltip="Higher priority goals are protected more strongly in opportunity trade-off calculations.">Priority
-                  <input name="priority" type="number" min="1" max="10" value="8" required />
-                </label>
-                <label>Deadline
-                  <input name="deadline" type="date" />
-                </label>
-              </div>
-              <input name="successMetrics" placeholder="Success metrics, comma separated" data-tooltip="Use outcomes you can verify, for example Complete CPTS or Apply to 20 internships." />
-              <button type="submit">Add Goal</button>
-            </form>
-
-            <form id="commitmentForm" class="form-panel">
-              <h3>Add Commitment</h3>
-              <input name="name" required placeholder="CPTS, HTB Machines, University, Gym" />
-              <select name="goalId"></select>
-              <div class="two-col">
-                <label>Time cost
-                  <div class="time-input">
-                    <input name="timeAmount" type="number" min="0" step="0.5" value="5" required />
-                    <select name="timeUnit" aria-label="Time unit">
-                      <option value="per_day">Per day</option>
-                      <option value="per_week" selected>Per week</option>
-                      <option value="per_month">Per month</option>
-                    </select>
-                  </div>
-                </label>
-                <label>Priority
-                  <input name="priority" type="number" min="1" max="10" value="7" required />
-                </label>
-              </div>
-              <div class="two-col">
-                <label>Start date
-                  <input name="startDate" type="date" />
-                </label>
-                <label>End date
-                  <input name="endDate" type="date" />
-                </label>
-              </div>
-              <label>Status
-                <select name="status">
-                  <option value="active" selected>Active</option>
-                  <option value="paused">Paused</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </label>
-              <textarea name="notes" placeholder="Notes"></textarea>
-              <button type="submit">Add Commitment</button>
-            </form>
-
-            <div class="panel">
-              <div class="panel-header">
-                <h3>Goals & Commitments</h3>
-                <span id="goalCount">0 active</span>
-              </div>
-              <div id="goalsList" class="entity-list"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view active" id="opportunitiesView">
-          <div class="work-grid opportunities-grid">
-            <form id="opportunityForm" class="form-panel">
-              <div class="form-header">
-                <h3 id="opportunityFormTitle">Add Opportunity</h3>
-                <button id="cancelOpportunityEdit" class="text-button hidden" type="button">Cancel</button>
-              </div>
-              <input name="title" required placeholder="Opportunity title" />
-              <textarea name="description" placeholder="Description"></textarea>
-              <div class="two-col">
-                <label>Category
-                  <select name="category">
-                    <option>internship</option>
-                    <option>academy</option>
-                    <option>competition</option>
-                    <option>certification</option>
-                    <option>startup idea</option>
-                    <option>networking</option>
-                  </select>
-                </label>
-                <label>Deadline
-                  <input name="deadline" type="date" />
-                </label>
-              </div>
-              <div class="two-col">
-                <label>Time required
-                  <div class="time-input">
-                    <input name="timeAmount" type="number" min="0" step="0.5" value="4" required />
-                    <select name="timeUnit" aria-label="Time unit">
-                      <option value="total">Total</option>
-                      <option value="per_day">Per day</option>
-                      <option value="per_week" selected>Per week</option>
-                      <option value="per_month">Per month</option>
-                    </select>
-                  </div>
-                </label>
-                <label>Duration
-                  <div class="duration-input">
-                    <input name="durationAmount" type="number" min="1" step="1" value="1" required />
-                    <select name="durationUnit" aria-label="Duration unit">
-                      <option value="day">Day(s)</option>
-                      <option value="week" selected>Week(s)</option>
-                      <option value="month">Month(s)</option>
-                    </select>
-                  </div>
-                </label>
-              </div>
-              <div class="two-col">
-                <label data-tooltip="Direct cash cost of the opportunity, shown in evaluation so time and money are both visible.">Money cost
-                  <div class="money-input">
-                    <select name="currency" aria-label="Currency">
-                      <option value="IDR" selected>IDR</option>
-                      <option value="USD">USD</option>
-                      <option value="SGD">SGD</option>
-                      <option value="EUR">EUR</option>
-                    </select>
-                    <input name="moneyCost" type="number" min="0" step="1" value="0" />
-                  </div>
-                </label>
-                <label data-tooltip="Manual 1-10 score for how strongly this opportunity supports your current goals.">Alignment
-                  <input name="alignmentScore" type="number" min="1" max="10" value="6" required />
-                </label>
-              </div>
-              <textarea name="notes" placeholder="Notes"></textarea>
-              <input name="expectedImpact" placeholder="Expected gain, comma separated" />
-              <div class="button-row">
-                <button id="reviewLaterSubmit" type="submit" name="reviewMode" value="later">Review Later</button>
-                <button id="reviewNowSubmit" type="submit" name="reviewMode" value="now">Review Now</button>
-              </div>
-            </form>
-            <div class="panel">
-              <div class="panel-header">
-                <h3>Inbox</h3>
-                <span id="opportunityCount">0 opportunities</span>
-              </div>
-              <div id="opportunitiesList" class="entity-list"></div>
-            </div>
-            <section class="panel wide">
-              <div class="panel-header">
-                <h3>Opportunity Evaluation</h3>
-                <span id="selectedOpportunityLabel">No selection</span>
-              </div>
-              <div id="evaluationOutput" class="evaluation-empty">Create or select an opportunity to see the cost of saying yes.</div>
-            </section>
-          </div>
-        </section>
-      </main>
-    </div>
-
-    <script src="app.js"></script>
+    <script src="landing.js"></script>
   </body>
 </html>
