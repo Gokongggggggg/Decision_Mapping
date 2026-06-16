@@ -21,7 +21,10 @@
           <button class="nav-item" data-view="dashboard">Dashboard</button>
           <button class="nav-item" data-view="goals">Goals</button>
         </nav>
-        <button id="loadDummyData" class="utility-button" type="button">Load Dummy Data</button>
+        <div class="sidebar-actions">
+          <button id="loadDummyData" class="utility-button" type="button">Load Demo Workspace</button>
+          <a class="back-link" href="index.html">Landing Page</a>
+        </div>
       </aside>
 
       <main class="main">
@@ -173,7 +176,7 @@
           <div class="work-grid opportunities-grid">
             <form id="opportunityForm" class="form-panel">
               <div class="form-header">
-                <h3 id="opportunityFormTitle">Add Opportunity</h3>
+                <h3 id="opportunityFormTitle">Capture Opportunity</h3>
                 <button id="cancelOpportunityEdit" class="text-button hidden" type="button">Cancel</button>
               </div>
               <input name="title" required placeholder="Opportunity title" />
@@ -241,7 +244,7 @@
             </form>
             <div class="panel">
               <div class="panel-header">
-                <h3>Inbox</h3>
+                <h3>Decision Queue</h3>
                 <span id="opportunityCount">0 opportunities</span>
               </div>
               <div id="opportunitiesList" class="entity-list"></div>

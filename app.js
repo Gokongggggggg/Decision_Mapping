@@ -756,7 +756,7 @@ function resetOpportunityForm() {
 
 function renderOpportunityFormState() {
   const isEditing = Boolean(state.editingOpportunityId);
-  $("#opportunityFormTitle").textContent = isEditing ? "Edit Opportunity" : "Add Opportunity";
+  $("#opportunityFormTitle").textContent = isEditing ? "Edit Opportunity" : "Capture Opportunity";
   $("#reviewLaterSubmit").textContent = isEditing ? "Update Later" : "Review Later";
   $("#reviewNowSubmit").textContent = isEditing ? "Update & Review" : "Review Now";
   $("#cancelOpportunityEdit").classList.toggle("hidden", !isEditing);
