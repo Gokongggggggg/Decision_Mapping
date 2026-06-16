@@ -31,20 +31,30 @@ It is intentionally simple, local-first, and built for fast iteration. The produ
 
 ## How To Run
 
-Open `index.html` directly in a browser to view the landing page.
+Install dependencies and start the Vite dev server:
 
-Open `app.html` directly in a browser to use the MVP app.
+```bash
+npm install
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+The old static implementation is preserved under `legacy/`.
 
 No build step or backend is required for the current MVP.
 
 ## Project Files
 
-- `index.html` - landing page
-- `app.html` - app structure
-- `styles.css` - UI styling
-- `landing.css` - landing page styling
-- `landing.js` - landing page interactive background
-- `app.js` - app state, rendering, calculations, and interactions
+- `src/App.tsx` - React application and redesigned UI
+- `src/data.ts` - seed and demo data
+- `src/decisionEngine.ts` - capacity and opportunity review logic
+- `src/types.ts` - product data types
+- `legacy/` - previous static HTML/CSS/JS implementation
 - `PRD_Opportunity_OS.md` - product requirements document
 
 ## MVP Limitations

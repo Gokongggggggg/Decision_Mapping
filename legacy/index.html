@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opportunity OS - Know the cost before saying yes</title>
+    <link rel="stylesheet" href="landing.css" />
+  </head>
+  <body>
+    <canvas id="decisionCanvas" aria-hidden="true"></canvas>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Opportunity OS home">
+        <span class="brand-mark">O</span>
+        <span>Opportunity OS</span>
+      </a>
+      <nav class="site-nav" aria-label="Landing navigation">
+        <a href="#review-engine">Review Engine</a>
+        <a href="#workflow">Workflow</a>
+        <a href="app.html">Open App</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">MVP v0.2</p>
+          <h1>Know the cost before saying yes.</h1>
+          <p class="hero-lede">
+            Opportunity OS helps you evaluate new opportunities against your goals, commitments, time cost, money cost, and current capacity.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="app.html">Open Opportunity OS</a>
+            <a class="secondary-action" href="#review-engine">See how it works</a>
+          </div>
+          <div class="trust-row" aria-label="Core product pillars">
+            <span>Goals</span>
+            <span>Commitments</span>
+            <span>Review Now</span>
+            <span>Trade-offs</span>
+          </div>
+        </div>
+
+        <div class="product-preview" aria-label="Opportunity OS product preview">
+          <div class="preview-topbar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="preview-grid">
+            <section class="preview-panel review-panel">
+              <div class="panel-label">Selected Opportunity</div>
+              <h2>PM Academy</h2>
+              <div class="preview-tags">
+                <span>8h per week</span>
+                <span>10 weeks</span>
+                <span>Pending Review</span>
+              </div>
+              <div class="impact-row danger">
+                <span>After Accept</span>
+                <strong>43h / 40h</strong>
+              </div>
+              <div class="impact-row danger">
+                <span>Overflow</span>
+                <strong>3h</strong>
+              </div>
+              <div class="recommendation">
+                <span>Recommendation</span>
+                <strong>Defer</strong>
+              </div>
+            </section>
+
+            <section class="preview-panel queue-panel">
+              <div class="panel-label">Decision Queue</div>
+              <div class="queue-item active">
+                <span>One-Day CTF</span>
+                <strong>9h total</strong>
+              </div>
+              <div class="queue-item">
+                <span>SMT Korea</span>
+                <strong>20h total</strong>
+              </div>
+              <div class="queue-item">
+                <span>Startup Idea</span>
+                <strong>30h / month</strong>
+              </div>
+            </section>
+
+            <section class="preview-panel capacity-panel">
+              <div class="panel-label">Capacity</div>
+              <div class="capacity-number">35h / 40h</div>
+              <div class="capacity-track">
+                <span></span>
+              </div>
+              <p>CPTS, HTB, University, Gym</p>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-band" id="review-engine">
+        <div class="section-heading">
+          <p class="eyebrow">Opportunity Review Engine</p>
+          <h2>Every review starts with your actual capacity.</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <span>01</span>
+            <h3>Capture the opportunity</h3>
+            <p>Add time cost, duration, money cost, deadline, notes, and expected gain.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Compare against commitments</h3>
+            <p>The system normalizes time units into weekly impact, then compares against your capacity.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>See what gets hit</h3>
+            <p>Affected commitments and goal impact are highlighted before you accept, defer, or reject.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="workflow" id="workflow">
+        <div class="workflow-copy">
+          <p class="eyebrow">Fast Workflow</p>
+          <h2>Review later when you are collecting. Review now when the decision matters.</h2>
+        </div>
+        <div class="workflow-steps">
+          <div>
+            <strong>Review Later</strong>
+            <span>Save the opportunity into the decision queue with no analysis yet.</span>
+          </div>
+          <div>
+            <strong>Review Now</strong>
+            <span>Open impact analysis immediately and inspect overflow, affected commitments, and goal drift.</span>
+          </div>
+          <div>
+            <strong>Decide</strong>
+            <span>Accept, reject, or defer with the trade-off visible.</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Opportunity OS is an MVP and will keep iterating.</span>
+      <a href="app.html">Launch app</a>
+    </footer>
+
+    <script src="landing.js"></script>
+  </body>
+</html>
