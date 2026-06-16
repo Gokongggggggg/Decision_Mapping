@@ -220,10 +220,10 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f2ea] text-zinc-950">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-zinc-200/80 bg-white/80 p-5 backdrop-blur-xl lg:flex lg:flex-col">
+    <div className="app-bg min-h-screen text-[#111317]">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-black/10 bg-white/75 p-5 shadow-[18px_0_60px_rgba(17,19,23,0.06)] backdrop-blur-xl lg:flex lg:flex-col">
         <button className="flex items-center gap-3 text-left" onClick={() => setMode("landing")}>
-          <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-700 text-lg font-black text-white">O</span>
+          <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-lime-300 text-lg font-black text-zinc-950 shadow-lg shadow-cyan-500/20">O</span>
           <span>
             <span className="block text-xs font-black uppercase text-zinc-500">Opportunity OS</span>
             <span className="block text-lg font-black">Decision Console</span>
@@ -238,7 +238,7 @@ export default function App() {
               <button
                 key={item.id}
                 className={`flex items-center justify-between rounded-xl px-3 py-3 text-left text-sm font-black transition ${
-                  active ? "bg-teal-50 text-teal-800" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
+                  active ? "bg-cyan-50 text-cyan-900 ring-1 ring-cyan-200" : "text-zinc-600 hover:bg-white hover:text-zinc-950"
                 }`}
                 onClick={() => setView(item.id)}
               >
@@ -253,10 +253,10 @@ export default function App() {
         </nav>
 
         <div className="mt-auto grid gap-3">
-          <button className="rounded-xl bg-zinc-950 px-4 py-3 text-sm font-black text-white" onClick={() => setState(demoState)}>
+          <button className="soft-shimmer rounded-xl bg-[#111317] px-4 py-3 text-sm font-black text-white shadow-lg shadow-zinc-950/15" onClick={() => setState(demoState)}>
             Load Demo Workspace
           </button>
-          <div className="rounded-2xl border border-zinc-200 bg-white p-4">
+          <div className="surface-card rounded-2xl p-4">
             <p className="text-xs font-black uppercase text-zinc-500">Weekly Capacity</p>
             <div className="mt-2 flex items-center gap-2">
               <input
@@ -274,10 +274,10 @@ export default function App() {
       </aside>
 
       <main className="lg:pl-72">
-        <header className="sticky top-0 z-20 border-b border-zinc-200/80 bg-[#f5f2ea]/80 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-20 border-b border-black/10 bg-white/68 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-black uppercase text-teal-700">MVP v0.2</p>
+              <p className="text-xs font-black uppercase text-cyan-700">MVP v0.2</p>
               <h1 className="text-3xl font-black tracking-tight lg:text-4xl">{navItems.find((item) => item.id === view)?.label}</h1>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:flex">
@@ -344,43 +344,42 @@ export default function App() {
 
 function LandingPage({ onOpenApp }: { onOpenApp: (view?: View) => void }) {
   return (
-    <div className="min-h-screen overflow-hidden bg-[#f6f2e8] text-zinc-950">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(15,118,110,0.16),transparent_30%),radial-gradient(circle_at_84%_16%,rgba(180,35,24,0.09),transparent_28%),linear-gradient(135deg,#f8f6ef,#edf6f2)]" />
+    <div className="landing-shell min-h-screen overflow-hidden text-[#111317]">
       <header className="relative z-10 flex items-center justify-between px-5 py-5 lg:px-10">
         <button className="flex items-center gap-3 text-left" onClick={() => onOpenApp("opportunities")}>
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-700 font-black text-white">O</span>
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-lime-300 font-black text-zinc-950 shadow-lg shadow-cyan-500/20">O</span>
           <span className="font-black">Opportunity OS</span>
         </button>
-        <nav className="hidden items-center gap-2 rounded-full border border-zinc-200 bg-white/70 p-1 backdrop-blur md:flex">
+        <nav className="hidden items-center gap-2 rounded-full border border-black/10 bg-white/70 p-1 shadow-lg shadow-zinc-950/5 backdrop-blur md:flex">
           <a className="rounded-full px-4 py-2 text-sm font-black text-zinc-600" href="#engine">Engine</a>
           <a className="rounded-full px-4 py-2 text-sm font-black text-zinc-600" href="#workflow">Workflow</a>
-          <button className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-black text-white" onClick={() => onOpenApp("opportunities")}>
+          <button className="rounded-full bg-[#111317] px-4 py-2 text-sm font-black text-white" onClick={() => onOpenApp("opportunities")}>
             Open App
           </button>
         </nav>
       </header>
 
       <section className="relative z-10 grid min-h-[calc(100vh-84px)] items-center gap-10 px-5 pb-12 pt-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-10">
-        <div className="max-w-3xl">
-          <p className="mb-4 text-xs font-black uppercase text-teal-800">Decision support for ambitious people</p>
-          <h1 className="text-6xl font-black leading-[0.9] tracking-tight sm:text-7xl lg:text-8xl">Know the cost before saying yes.</h1>
+        <div className="reveal max-w-3xl">
+          <p className="mb-4 text-xs font-black uppercase text-cyan-700">Decision support for ambitious people</p>
+          <h1 className="gradient-text text-6xl font-black leading-[0.9] tracking-tight sm:text-7xl lg:text-8xl">Know the cost before saying yes.</h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
             Evaluate incoming academies, competitions, certifications, projects, internships, and startup ideas against the goals and commitments already fighting for your capacity.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button className="rounded-xl bg-teal-700 px-5 py-4 font-black text-white shadow-xl shadow-teal-900/20" onClick={() => onOpenApp("opportunities")}>
+            <button className="soft-shimmer rounded-xl bg-[#111317] px-5 py-4 font-black text-white shadow-xl shadow-zinc-950/20" onClick={() => onOpenApp("opportunities")}>
               Open Opportunity OS
             </button>
-            <button className="rounded-xl border border-zinc-200 bg-white/70 px-5 py-4 font-black text-zinc-900" onClick={() => onOpenApp("dashboard")}>
+            <button className="rounded-xl border border-black/10 bg-white/75 px-5 py-4 font-black text-zinc-900 shadow-lg shadow-zinc-950/5 backdrop-blur" onClick={() => onOpenApp("dashboard")}>
               View Dashboard
             </button>
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-white/80 bg-white/70 p-4 shadow-2xl shadow-zinc-900/10 backdrop-blur-xl">
+        <div className="surface-card float-panel reveal reveal-delay-1 rounded-[1.35rem] p-4">
           <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl bg-zinc-950 p-5 text-white">
-              <p className="text-xs font-black uppercase text-teal-200">Opportunity Review</p>
+            <div className="soft-shimmer rounded-2xl bg-[#111317] p-5 text-white shadow-2xl shadow-zinc-950/20">
+              <p className="text-xs font-black uppercase text-cyan-200">Opportunity Review</p>
               <h2 className="mt-3 text-3xl font-black">PM Academy</h2>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <PreviewStat label="Current Load" value="35h / 40h" />
@@ -390,20 +389,20 @@ function LandingPage({ onOpenApp }: { onOpenApp: (view?: View) => void }) {
               </div>
             </div>
             <div className="grid gap-4">
-              <div className="rounded-3xl border border-zinc-200 bg-white p-5">
+              <div className="rounded-2xl border border-black/10 bg-white p-5">
                 <p className="text-xs font-black uppercase text-zinc-500">Affected Commitments</p>
                 <div className="mt-4 grid gap-2">
                   {["CPTS progress", "HTB practice", "Portfolio project"].map((item) => (
-                    <div key={item} className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-black text-red-700">
+                    <div key={item} className="impact-pulse rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-black text-rose-700">
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="rounded-3xl border border-zinc-200 bg-white p-5">
+              <div className="rounded-2xl border border-black/10 bg-white p-5">
                 <p className="text-xs font-black uppercase text-zinc-500">Decision Queue</p>
                 <div className="mt-4 space-y-2 text-sm font-black">
-                  <div className="flex justify-between rounded-xl bg-teal-50 px-3 py-2 text-teal-800">
+                  <div className="flex justify-between rounded-xl bg-cyan-50 px-3 py-2 text-cyan-800">
                     <span>One-Day CTF</span>
                     <span>9h total</span>
                   </div>
@@ -418,9 +417,9 @@ function LandingPage({ onOpenApp }: { onOpenApp: (view?: View) => void }) {
         </div>
       </section>
 
-      <section id="engine" className="relative z-10 mx-5 mb-5 rounded-[2rem] border border-zinc-200 bg-white/80 p-6 backdrop-blur lg:mx-10 lg:p-10">
+      <section id="engine" className="surface-card reveal reveal-delay-2 relative z-10 mx-5 mb-5 rounded-[1.35rem] p-6 lg:mx-10 lg:p-10">
         <div className="max-w-3xl">
-          <p className="text-xs font-black uppercase text-teal-800">Review Engine</p>
+          <p className="text-xs font-black uppercase text-cyan-700">Review Engine</p>
           <h2 className="mt-3 text-4xl font-black tracking-tight lg:text-6xl">Turn vague opportunity cost into a visible trade-off.</h2>
         </div>
         <div className="mt-8 grid gap-4 lg:grid-cols-3">
@@ -429,8 +428,8 @@ function LandingPage({ onOpenApp }: { onOpenApp: (view?: View) => void }) {
             ["Normalize", "Convert per-day, per-week, per-month, and total time into weekly impact."],
             ["Decide", "See affected commitments and goal impact before accepting, rejecting, or deferring."]
           ].map(([title, body], index) => (
-            <div key={title} className="rounded-3xl border border-zinc-200 bg-white p-5">
-              <span className="text-sm font-black text-teal-800">0{index + 1}</span>
+            <div key={title} className="surface-card rounded-2xl p-5">
+              <span className="text-sm font-black text-cyan-700">0{index + 1}</span>
               <h3 className="mt-5 text-xl font-black">{title}</h3>
               <p className="mt-2 leading-7 text-zinc-600">{body}</p>
             </div>
@@ -459,10 +458,10 @@ function OpportunityWorkspace(props: {
 
   return (
     <div className="grid gap-5 xl:grid-cols-[420px_minmax(360px,0.9fr)_minmax(420px,1.1fr)]">
-      <form className="rounded-3xl border border-zinc-200 bg-white/90 p-5 shadow-sm xl:sticky xl:top-32 xl:self-start" onSubmit={(event) => submitOpportunity(event, "later")}>
+      <form className="surface-card reveal rounded-2xl p-5 xl:sticky xl:top-32 xl:self-start" onSubmit={(event) => submitOpportunity(event, "later")}>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase text-teal-700">Capture</p>
+            <p className="text-xs font-black uppercase text-cyan-700">Capture</p>
             <h2 className="text-2xl font-black">{editingOpportunityId ? "Edit Opportunity" : "New Opportunity"}</h2>
           </div>
           {editingOpportunityId ? (
@@ -538,16 +537,16 @@ function OpportunityWorkspace(props: {
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <button className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-3 font-black" type="submit">
+          <button className="rounded-xl border border-black/10 bg-white px-4 py-3 font-black shadow-sm" type="submit">
             Review Later
           </button>
-          <button className="rounded-xl bg-teal-700 px-4 py-3 font-black text-white" type="button" onClick={(event) => submitOpportunity(event as unknown as FormEvent<HTMLFormElement>, "now")}>
+          <button className="soft-shimmer rounded-xl bg-[#111317] px-4 py-3 font-black text-white shadow-lg shadow-zinc-950/15" type="button" onClick={(event) => submitOpportunity(event as unknown as FormEvent<HTMLFormElement>, "now")}>
             Review Now
           </button>
         </div>
       </form>
 
-      <section className="rounded-3xl border border-zinc-200 bg-white/90 p-5 shadow-sm">
+      <section className="surface-card reveal reveal-delay-1 rounded-2xl p-5">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-black uppercase text-zinc-500">Queue</p>
@@ -570,7 +569,7 @@ function OpportunityWorkspace(props: {
 function ReviewPanel({ evaluation, state }: { evaluation: ReturnType<typeof evaluateOpportunity> | null; state: AppState }) {
   if (!evaluation) {
     return (
-      <section className="grid min-h-[520px] place-items-center rounded-3xl border border-dashed border-zinc-300 bg-white/60 p-8 text-center">
+      <section className="surface-card reveal reveal-delay-2 grid min-h-[520px] place-items-center rounded-2xl border-dashed p-8 text-center">
         <div>
           <Inbox className="mx-auto text-zinc-400" size={42} />
           <h2 className="mt-4 text-2xl font-black">Select an opportunity to review</h2>
@@ -584,10 +583,10 @@ function ReviewPanel({ evaluation, state }: { evaluation: ReturnType<typeof eval
   const tone = recommendationTone(evaluation.recommendation);
 
   return (
-    <section className="rounded-3xl border border-zinc-200 bg-white/95 p-5 shadow-sm">
+    <section className="surface-card reveal reveal-delay-2 rounded-2xl p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase text-teal-700">Opportunity Review</p>
+          <p className="text-xs font-black uppercase text-cyan-700">Opportunity Review</p>
           <h2 className="text-3xl font-black tracking-tight">{evaluation.opportunity.title}</h2>
           <p className="mt-2 text-zinc-600">{evaluation.opportunity.description || "No description provided."}</p>
         </div>
@@ -616,11 +615,11 @@ function ReviewPanel({ evaluation, state }: { evaluation: ReturnType<typeof eval
         />
       </div>
 
-      <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+      <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
         <h3 className="font-black">Current commitments benchmark</h3>
         <div className="mt-3 grid gap-2">
           {state.commitments.map((item) => (
-            <div key={item.id} className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-sm">
+            <div key={item.id} className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm ${danger ? "impact-pulse border border-rose-200 bg-rose-50 text-rose-800" : "bg-white"}`}>
               <span className="font-black">{item.name}</span>
               <span className="text-zinc-500">{hours(weeklyImpact(item))} weekly impact</span>
             </div>
@@ -641,7 +640,7 @@ function OpportunityCard(props: {
 }) {
   const { opportunity, selected } = props;
   return (
-    <article className={`rounded-2xl border p-4 transition ${selected ? "border-teal-300 bg-teal-50/70" : "border-zinc-200 bg-white hover:border-teal-200"}`}>
+    <article className={`rounded-2xl border p-4 transition ${selected ? "border-cyan-300 bg-cyan-50/80 shadow-lg shadow-cyan-500/10" : "border-black/10 bg-white/80 hover:border-cyan-200 hover:bg-white"}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-black">{opportunity.title}</h3>
@@ -656,7 +655,7 @@ function OpportunityCard(props: {
         <Tag>{money(opportunity.moneyCost, opportunity.currency)}</Tag>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        <button className="rounded-xl bg-zinc-950 px-3 py-2 text-xs font-black text-white" onClick={() => props.onSelect(opportunity.id)}>
+        <button className="rounded-xl bg-[#111317] px-3 py-2 text-xs font-black text-white" onClick={() => props.onSelect(opportunity.id)}>
           Review
         </button>
         <button className="rounded-xl bg-zinc-100 px-3 py-2 text-xs font-black" onClick={() => props.onEdit(opportunity)}>
@@ -687,10 +686,10 @@ function Dashboard({ state, stats, pending, recent, openOpportunities }: { state
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-5">
+        <section className="surface-card rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black">Current Focus</h2>
-            <Target className="text-teal-700" />
+            <Target className="text-cyan-700" />
           </div>
           <div className="mt-4 grid gap-3">
             {[...state.goals]
@@ -708,10 +707,10 @@ function Dashboard({ state, stats, pending, recent, openOpportunities }: { state
           </div>
         </section>
 
-        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-5">
+        <section className="surface-card rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black">Decision Queue</h2>
-            <button className="rounded-xl bg-zinc-950 px-3 py-2 text-sm font-black text-white" onClick={openOpportunities}>
+            <button className="rounded-xl bg-[#111317] px-3 py-2 text-sm font-black text-white" onClick={openOpportunities}>
               Review
             </button>
           </div>
@@ -720,7 +719,7 @@ function Dashboard({ state, stats, pending, recent, openOpportunities }: { state
           </div>
         </section>
 
-        <section className="rounded-3xl border border-zinc-200 bg-white/90 p-5 lg:col-span-2">
+        <section className="surface-card rounded-2xl p-5 lg:col-span-2">
           <h2 className="text-2xl font-black">Recent Decisions</h2>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {recent.length ? recent.map((item) => <OpportunityMini key={item.id} opportunity={item} />) : <EmptyText>No decisions yet.</EmptyText>}
@@ -745,7 +744,7 @@ function GoalsWorkspace(props: {
   const { state, goalForm, setGoalForm, commitmentForm, setCommitmentForm } = props;
   return (
     <div className="grid gap-5 xl:grid-cols-[360px_360px_1fr]">
-      <form className="rounded-3xl border border-zinc-200 bg-white/90 p-5" onSubmit={props.addGoal}>
+      <form className="surface-card rounded-2xl p-5" onSubmit={props.addGoal}>
         <h2 className="text-2xl font-black">Add Goal</h2>
         <div className="mt-5 grid gap-4">
           <Field label="Name">
@@ -765,11 +764,11 @@ function GoalsWorkspace(props: {
           <Field label="Success Metrics">
             <input value={goalForm.successMetrics} onChange={(event) => setGoalForm({ ...goalForm, successMetrics: event.target.value })} placeholder="Complete CPTS, Apply to internships" />
           </Field>
-          <button className="rounded-xl bg-teal-700 px-4 py-3 font-black text-white">Add Goal</button>
+          <button className="rounded-xl bg-[#111317] px-4 py-3 font-black text-white">Add Goal</button>
         </div>
       </form>
 
-      <form className="rounded-3xl border border-zinc-200 bg-white/90 p-5" onSubmit={props.addCommitment}>
+      <form className="surface-card rounded-2xl p-5" onSubmit={props.addCommitment}>
         <h2 className="text-2xl font-black">Add Commitment</h2>
         <div className="mt-5 grid gap-4">
           <Field label="Name">
@@ -800,11 +799,11 @@ function GoalsWorkspace(props: {
           <Field label="Priority">
             <input type="number" min={1} max={10} value={commitmentForm.priority} onChange={(event) => setCommitmentForm({ ...commitmentForm, priority: Number(event.target.value) })} />
           </Field>
-          <button className="rounded-xl bg-teal-700 px-4 py-3 font-black text-white">Add Commitment</button>
+          <button className="rounded-xl bg-[#111317] px-4 py-3 font-black text-white">Add Commitment</button>
         </div>
       </form>
 
-      <section className="rounded-3xl border border-zinc-200 bg-white/90 p-5">
+      <section className="surface-card rounded-2xl p-5">
         <h2 className="text-2xl font-black">Goals & Commitments</h2>
         <div className="mt-5 grid gap-4">
           {state.goals.map((goal) => (
@@ -850,9 +849,9 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function MetricPill({ label, value, tone }: { label: string; value: string; tone?: "good" | "warn" | "bad" }) {
-  const toneClass = tone === "bad" ? "text-red-700" : tone === "warn" ? "text-amber-700" : tone === "good" ? "text-teal-700" : "text-zinc-950";
+  const toneClass = tone === "bad" ? "text-rose-700" : tone === "warn" ? "text-amber-700" : tone === "good" ? "text-lime-700" : "text-zinc-950";
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white/80 px-4 py-3">
+    <div className="rounded-2xl border border-black/10 bg-white/78 px-4 py-3 shadow-sm backdrop-blur">
       <p className="text-xs font-black uppercase text-zinc-500">{label}</p>
       <p className={`text-xl font-black ${toneClass}`}>{value}</p>
     </div>
@@ -861,12 +860,12 @@ function MetricPill({ label, value, tone }: { label: string; value: string; tone
 
 function MetricCard({ icon: Icon, label, value, helper, danger }: { icon: typeof Clock3; label: string; value: string; helper: string; danger?: boolean }) {
   return (
-    <article className="rounded-3xl border border-zinc-200 bg-white/90 p-5">
+    <article className="surface-card rounded-2xl p-5">
       <div className="flex items-center justify-between">
         <p className="text-xs font-black uppercase text-zinc-500">{label}</p>
-        <Icon className={danger ? "text-red-700" : "text-teal-700"} size={20} />
+        <Icon className={danger ? "text-rose-700" : "text-cyan-700"} size={20} />
       </div>
-      <strong className={`mt-4 block text-4xl font-black ${danger ? "text-red-700" : ""}`}>{value}</strong>
+      <strong className={`mt-4 block text-4xl font-black ${danger ? "text-rose-700" : ""}`}>{value}</strong>
       <p className="mt-2 text-sm font-bold text-zinc-500">{helper}</p>
     </article>
   );
@@ -874,7 +873,7 @@ function MetricCard({ icon: Icon, label, value, helper, danger }: { icon: typeof
 
 function ReviewStat({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
   return (
-    <div className={`rounded-2xl border p-4 ${danger ? "animate-pulse border-red-200 bg-red-50 text-red-700" : "border-zinc-200 bg-zinc-50"}`}>
+    <div className={`rounded-2xl border p-4 ${danger ? "impact-pulse border-rose-200 bg-rose-50 text-rose-700" : "border-black/10 bg-white/75"}`}>
       <p className="text-xs font-black uppercase opacity-70">{label}</p>
       <strong className="mt-2 block text-2xl font-black">{value}</strong>
     </div>
@@ -883,11 +882,11 @@ function ReviewStat({ label, value, danger }: { label: string; value: string; da
 
 function ImpactBlock({ title, items, danger }: { title: string; items: string[]; danger?: boolean }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+    <div className="rounded-2xl border border-black/10 bg-white/68 p-4">
       <h3 className="font-black">{title}</h3>
       <div className="mt-3 grid gap-2">
         {items.map((item) => (
-          <div key={item} className={`rounded-xl px-3 py-2 text-sm font-bold ${danger ? "animate-pulse bg-red-50 text-red-700" : "bg-white text-zinc-700"}`}>
+          <div key={item} className={`rounded-xl px-3 py-2 text-sm font-bold ${danger ? "impact-pulse border border-rose-200 bg-rose-50 text-rose-700" : "bg-white text-zinc-700"}`}>
             {item}
           </div>
         ))}
@@ -897,12 +896,12 @@ function ImpactBlock({ title, items, danger }: { title: string; items: string[];
 }
 
 function ToneBadge({ tone, children }: { tone: string; children: ReactNode }) {
-  const className = tone === "good" ? "bg-emerald-50 text-emerald-700" : tone === "bad" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700";
+  const className = tone === "good" ? "bg-lime-50 text-lime-700" : tone === "bad" ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700";
   return <span className={`rounded-full px-3 py-1 text-xs font-black ${className}`}>{children}</span>;
 }
 
 function Tag({ children }: { children: ReactNode }) {
-  return <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-black text-zinc-600">{children}</span>;
+  return <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-zinc-600 ring-1 ring-black/10">{children}</span>;
 }
 
 function EmptyText({ children }: { children: ReactNode }) {
@@ -911,7 +910,7 @@ function EmptyText({ children }: { children: ReactNode }) {
 
 function OpportunityMini({ opportunity }: { opportunity: Opportunity }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+    <div className="rounded-2xl border border-black/10 bg-white/75 p-4">
       <div className="flex items-center justify-between">
         <strong>{opportunity.title}</strong>
         <ToneBadge tone={recommendationTone(statusLabel(opportunity.status))}>{statusLabel(opportunity.status)}</ToneBadge>
@@ -925,7 +924,7 @@ function OpportunityMini({ opportunity }: { opportunity: Opportunity }) {
 
 function PreviewStat({ label, value, danger, warn }: { label: string; value: string; danger?: boolean; warn?: boolean }) {
   return (
-    <div className={`rounded-2xl p-4 ${danger ? "bg-red-500/15 text-red-100" : warn ? "bg-amber-400/15 text-amber-100" : "bg-white/10"}`}>
+    <div className={`rounded-2xl p-4 ${danger ? "impact-pulse bg-rose-500/15 text-rose-100" : warn ? "bg-lime-400/15 text-lime-100" : "bg-white/10"}`}>
       <p className="text-xs font-black uppercase opacity-70">{label}</p>
       <strong className="mt-2 block text-2xl font-black">{value}</strong>
     </div>
