@@ -22,6 +22,8 @@ It is intentionally simple, local-first, and built for fast iteration. The produ
 - Opportunity inbox
 - Opportunity review engine
 - Flexible opportunity duration units
+- Flexible time cost units with weekly impact normalization
+- Dummy testing dataset loader
 - Rule-based recommendation: Accept, Defer, or Reject
 - Opportunity editing
 - Local data persistence with `localStorage`

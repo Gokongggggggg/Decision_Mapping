@@ -115,6 +115,7 @@ h5 {
 
 .nav-item,
 .text-button,
+.utility-button,
 form button,
 .entity-actions button {
   border: 0;
@@ -133,6 +134,18 @@ form button,
 .nav-item:hover {
   background: #e8f3f1;
   color: var(--accent-dark);
+}
+
+.utility-button {
+  margin-top: auto;
+  background: #202124;
+  color: #fff;
+  padding: 11px 12px;
+  font-weight: 800;
+}
+
+.utility-button:hover {
+  background: #344054;
 }
 
 .panel,
@@ -401,6 +414,7 @@ textarea:focus {
 }
 
 .money-input,
+.time-input,
 .duration-input {
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
@@ -721,6 +735,7 @@ form button:hover {
   .topbar-actions,
   .capacity-control,
   .money-input,
+  .time-input,
   .duration-input {
     width: 100%;
   }

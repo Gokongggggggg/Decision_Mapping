@@ -21,6 +21,7 @@
           <button class="nav-item" data-view="dashboard">Dashboard</button>
           <button class="nav-item" data-view="goals">Goals</button>
         </nav>
+        <button id="loadDummyData" class="utility-button" type="button">Load Dummy Data</button>
       </aside>
 
       <main class="main">
@@ -43,7 +44,7 @@
 
         <section class="view" id="dashboardView">
           <div class="metrics-grid">
-            <article class="metric" data-tooltip="Hours already allocated to action plans and recurring commitments.">
+            <article class="metric" data-tooltip="Weekly impact already allocated to active commitments.">
               <span>Allocated</span>
               <strong id="allocatedHours">0h</strong>
               <small id="allocatedHint">No active allocation yet</small>
@@ -125,8 +126,15 @@
               <input name="name" required placeholder="CPTS, HTB Machines, University, Gym" />
               <select name="goalId"></select>
               <div class="two-col">
-                <label>Weekly hours
-                  <input name="weeklyHours" type="number" min="0" step="0.5" value="5" required />
+                <label>Time cost
+                  <div class="time-input">
+                    <input name="timeAmount" type="number" min="0" step="0.5" value="5" required />
+                    <select name="timeUnit" aria-label="Time unit">
+                      <option value="per_day">Per day</option>
+                      <option value="per_week" selected>Per week</option>
+                      <option value="per_month">Per month</option>
+                    </select>
+                  </div>
                 </label>
                 <label>Priority
                   <input name="priority" type="number" min="1" max="10" value="7" required />
@@ -186,8 +194,16 @@
                 </label>
               </div>
               <div class="two-col">
-                <label>Weekly hours
-                  <input name="weeklyHours" type="number" min="0" step="0.5" value="4" required />
+                <label>Time required
+                  <div class="time-input">
+                    <input name="timeAmount" type="number" min="0" step="0.5" value="4" required />
+                    <select name="timeUnit" aria-label="Time unit">
+                      <option value="total">Total</option>
+                      <option value="per_day">Per day</option>
+                      <option value="per_week" selected>Per week</option>
+                      <option value="per_month">Per month</option>
+                    </select>
+                  </div>
                 </label>
                 <label>Duration
                   <div class="duration-input">

@@ -26,7 +26,8 @@ const seedState = {
       id: "commitment_cpts",
       goalId: "goal_security_intern",
       name: "CPTS",
-      weeklyHours: 10,
+      timeAmount: 10,
+      timeUnit: "per_week",
       priority: 10,
       startDate: "",
       endDate: "",
@@ -37,7 +38,8 @@ const seedState = {
       id: "commitment_htb",
       goalId: "goal_security_intern",
       name: "HTB Machines",
-      weeklyHours: 5,
+      timeAmount: 5,
+      timeUnit: "per_week",
       priority: 9,
       startDate: "",
       endDate: "",
@@ -48,7 +50,8 @@ const seedState = {
       id: "commitment_university",
       goalId: "",
       name: "University",
-      weeklyHours: 20,
+      timeAmount: 20,
+      timeUnit: "per_week",
       priority: 8,
       startDate: "",
       endDate: "",
@@ -59,7 +62,8 @@ const seedState = {
       id: "commitment_gym",
       goalId: "goal_security_intern",
       name: "Gym",
-      weeklyHours: 4,
+      timeAmount: 4,
+      timeUnit: "per_week",
       priority: 5,
       startDate: "",
       endDate: "",
@@ -73,7 +77,8 @@ const seedState = {
       title: "COMPFEST PM Academy",
       description: "Product management academy program.",
       category: "academy",
-      weeklyHours: 8,
+      timeAmount: 8,
+      timeUnit: "per_week",
       durationAmount: 10,
       durationUnit: "week",
       moneyCost: 0,
@@ -86,6 +91,176 @@ const seedState = {
     }
   ]
 };
+
+function createDummyState() {
+  return {
+    weeklyCapacity: 40,
+    selectedOpportunityId: "opportunity_pm_academy",
+    editingOpportunityId: null,
+    goals: [
+      {
+        id: "goal_security_intern",
+        name: "Security Internship",
+        description: "Prepare for security internship applications.",
+        priority: 10,
+        deadline: "2026-12-31",
+        successMetrics: ["Complete CPTS", "Build portfolio", "Apply to internships"],
+        status: "active"
+      },
+      {
+        id: "goal_product_building",
+        name: "Product Building",
+        description: "Ship practical products and improve product thinking.",
+        priority: 7,
+        deadline: "2026-10-31",
+        successMetrics: ["Ship MVP", "Get user feedback"],
+        status: "active"
+      },
+      {
+        id: "goal_health",
+        name: "Health Baseline",
+        description: "Maintain energy while pursuing technical goals.",
+        priority: 6,
+        deadline: "",
+        successMetrics: ["Train consistently", "Sleep baseline"],
+        status: "active"
+      }
+    ],
+    initiatives: [],
+    commitments: [
+      {
+        id: "commitment_cpts",
+        goalId: "goal_security_intern",
+        name: "CPTS",
+        timeAmount: 10,
+        timeUnit: "per_week",
+        priority: 10,
+        startDate: "",
+        endDate: "",
+        status: "active",
+        notes: "Core certification prep"
+      },
+      {
+        id: "commitment_htb",
+        goalId: "goal_security_intern",
+        name: "HTB Machines",
+        timeAmount: 1.5,
+        timeUnit: "per_day",
+        priority: 9,
+        startDate: "",
+        endDate: "",
+        status: "active",
+        notes: "Daily practical reps"
+      },
+      {
+        id: "commitment_university",
+        goalId: "",
+        name: "University",
+        timeAmount: 18,
+        timeUnit: "per_week",
+        priority: 8,
+        startDate: "",
+        endDate: "",
+        status: "active",
+        notes: "Classes and assignments"
+      },
+      {
+        id: "commitment_portfolio",
+        goalId: "goal_product_building",
+        name: "Portfolio Project",
+        timeAmount: 12,
+        timeUnit: "per_month",
+        priority: 7,
+        startDate: "",
+        endDate: "",
+        status: "active",
+        notes: "Monthly shipping block"
+      },
+      {
+        id: "commitment_gym",
+        goalId: "goal_health",
+        name: "Gym",
+        timeAmount: 4,
+        timeUnit: "per_week",
+        priority: 5,
+        startDate: "",
+        endDate: "",
+        status: "active",
+        notes: "Energy maintenance"
+      }
+    ],
+    opportunities: [
+      {
+        id: "opportunity_pm_academy",
+        title: "PM Academy",
+        description: "Product management academy with weekly sessions and assignments.",
+        category: "academy",
+        timeAmount: 8,
+        timeUnit: "per_week",
+        durationAmount: 10,
+        durationUnit: "week",
+        moneyCost: 0,
+        currency: "IDR",
+        deadline: "",
+        notes: "Good network, but competes with CPTS and HTB.",
+        alignmentScore: 6,
+        expectedImpact: ["Product Thinking", "Network", "Certificate"],
+        status: "pending_review"
+      },
+      {
+        id: "opportunity_ctf_day",
+        title: "One-Day CTF Competition",
+        description: "Short security competition happening this weekend.",
+        category: "competition",
+        timeAmount: 9,
+        timeUnit: "total",
+        durationAmount: 1,
+        durationUnit: "day",
+        moneyCost: 50000,
+        currency: "IDR",
+        deadline: "2026-07-12",
+        notes: "One intense day, low long-term commitment.",
+        alignmentScore: 9,
+        expectedImpact: ["Security Practice", "Team Experience"],
+        status: "pending_review"
+      },
+      {
+        id: "opportunity_startup_idea",
+        title: "New Startup Idea",
+        description: "Explore and validate a new SaaS idea.",
+        category: "startup idea",
+        timeAmount: 30,
+        timeUnit: "per_month",
+        durationAmount: 3,
+        durationUnit: "month",
+        moneyCost: 200000,
+        currency: "IDR",
+        deadline: "",
+        notes: "Interesting, but broad and potentially distracting.",
+        alignmentScore: 5,
+        expectedImpact: ["Business Learning", "Product Portfolio"],
+        status: "deferred"
+      },
+      {
+        id: "opportunity_smt_korea",
+        title: "SMT Korea",
+        description: "International program with short application window.",
+        category: "academy",
+        timeAmount: 20,
+        timeUnit: "total",
+        durationAmount: 2,
+        durationUnit: "week",
+        moneyCost: 1000000,
+        currency: "IDR",
+        deadline: "2026-08-01",
+        notes: "Useful exposure, but medium relevance.",
+        alignmentScore: 6,
+        expectedImpact: ["International Exposure", "Network"],
+        status: "pending_review"
+      }
+    ]
+  };
+}
 
 let state = loadState();
 
@@ -110,7 +285,8 @@ function migrateState(nextState) {
       id: `commitment_${item.id}`,
       goalId: item.goalId || "",
       name: item.name,
-      weeklyHours: Number(item.estimatedWeeklyHours || 0),
+      timeAmount: Number(item.estimatedWeeklyHours || item.weeklyHours || 0),
+      timeUnit: "per_week",
       priority: Number(goalByIdFrom(nextState, item.goalId)?.priority || 5),
       startDate: "",
       endDate: "",
@@ -119,7 +295,20 @@ function migrateState(nextState) {
     });
   });
 
-  return { ...nextState, initiatives: [], commitments: migratedCommitments };
+  const normalizedCommitments = migratedCommitments.map((item) => ({
+    ...item,
+    timeAmount: Number(item.timeAmount ?? item.weeklyHours ?? 0),
+    timeUnit: item.timeUnit || "per_week"
+  }));
+  const normalizedOpportunities = (nextState.opportunities || []).map((item) => ({
+    ...item,
+    timeAmount: Number(item.timeAmount ?? item.weeklyHours ?? 0),
+    timeUnit: item.timeUnit || "per_week",
+    durationAmount: Number(item.durationAmount ?? item.durationWeeks ?? 1),
+    durationUnit: item.durationUnit || "week"
+  }));
+
+  return { ...nextState, initiatives: [], commitments: normalizedCommitments, opportunities: normalizedOpportunities };
 }
 
 function goalByIdFrom(nextState, id) {
@@ -148,6 +337,35 @@ function durationLabel(opportunity) {
   return `${amount} ${unit}${amount === 1 ? "" : "s"}`;
 }
 
+function durationInWeeks(item) {
+  const amount = Math.max(Number(item.durationAmount || item.durationWeeks || 1), 1);
+  const unit = item.durationUnit || "week";
+  if (unit === "day") return Math.max(amount / 7, 1 / 7);
+  if (unit === "month") return amount * 4.345;
+  return amount;
+}
+
+function weeklyImpact(item) {
+  const amount = Number(item.timeAmount ?? item.weeklyHours ?? 0);
+  const unit = item.timeUnit || "per_week";
+  if (unit === "per_day") return amount * 7;
+  if (unit === "per_month") return amount / 4.345;
+  if (unit === "total") return amount / Math.max(durationInWeeks(item), 1);
+  return amount;
+}
+
+function timeLabel(item) {
+  const amount = Number(item.timeAmount ?? item.weeklyHours ?? 0);
+  const unit = item.timeUnit || "per_week";
+  const labels = {
+    total: "total",
+    per_day: "per day",
+    per_week: "per week",
+    per_month: "per month"
+  };
+  return `${hours(amount)} ${labels[unit] || "per week"}`;
+}
+
 function money(value, currency = "IDR") {
   const amount = Number(value || 0);
   return new Intl.NumberFormat("en-US", {
@@ -169,7 +387,7 @@ function activeCommitments() {
 }
 
 function capacityStats(extraHours = 0) {
-  const commitmentHours = activeCommitments().reduce((sum, item) => sum + Number(item.weeklyHours || 0), 0);
+  const commitmentHours = activeCommitments().reduce((sum, item) => sum + weeklyImpact(item), 0);
   const allocated = commitmentHours;
   const capacity = Number(state.weeklyCapacity || 0);
   const remaining = capacity - allocated;
@@ -298,7 +516,7 @@ function renderCommitmentRow(item) {
     <div class="mini-item">
       <div>
         <strong>${escapeHtml(item.name)}</strong>
-        <span>${hours(item.weeklyHours)}/week - Priority ${item.priority || 5} - ${escapeHtml(item.status || "active")}</span>
+        <span>${timeLabel(item)} - weekly impact ${hours(weeklyImpact(item))} - Priority ${item.priority || 5} - ${escapeHtml(item.status || "active")}</span>
       </div>
       <div class="entity-actions">
         <button class="danger-action" data-delete-commitment="${item.id}">Delete</button>
@@ -312,7 +530,7 @@ function renderDashboardSections() {
   const decided = state.opportunities.filter((item) => ["accepted", "rejected", "deferred"].includes(item.status)).slice(-5).reverse();
 
   $("#decisionQueue").innerHTML = pending
-    .map((item) => `<div class="entity"><strong>${escapeHtml(item.title)}</strong><div class="entity-meta"><span class="tag amber">Pending Review</span><span class="tag">${hours(item.weeklyHours)}/week</span></div></div>`)
+    .map((item) => `<div class="entity"><strong>${escapeHtml(item.title)}</strong><div class="entity-meta"><span class="tag amber">Pending Review</span><span class="tag">${timeLabel(item)}</span><span class="tag">${hours(weeklyImpact(item))} weekly impact</span></div></div>`)
     .join("") || empty("No pending reviews.");
 
   $("#recentDecisions").innerHTML = decided
@@ -343,7 +561,8 @@ function renderOpportunities() {
         </div>
         <div class="entity-meta">
           <span class="tag">${escapeHtml(item.category)}</span>
-          <span class="tag">${hours(item.weeklyHours)}/week</span>
+          <span class="tag">${timeLabel(item)}</span>
+          <span class="tag">${hours(weeklyImpact(item))} weekly impact</span>
           <span class="tag">${money(item.moneyCost, item.currency || "IDR")}</span>
           <span class="tag blue">${durationLabel(item)}</span>
           <span class="tag green">Alignment ${item.alignmentScore}/10</span>
@@ -356,8 +575,9 @@ function renderOpportunities() {
 }
 
 function evaluateOpportunity(opportunity) {
-  const stats = capacityStats(opportunity.weeklyHours);
-  const overflow = Math.max(0, Number(opportunity.weeklyHours || 0) - stats.remaining);
+  const opportunityImpact = weeklyImpact(opportunity);
+  const stats = capacityStats(opportunityImpact);
+  const overflow = Math.max(0, opportunityImpact - stats.remaining);
   const alignment = Number(opportunity.alignmentScore || 0);
   const topGoalPriority = Math.max(...state.goals.map((goal) => Number(goal.priority || 0)), 0);
   const focusDrift = alignment >= 8 ? "Low" : alignment >= 5 ? "Medium" : "High";
@@ -373,7 +593,7 @@ function evaluateOpportunity(opportunity) {
     .map((goalId) => goalById(goalId))
     .filter(Boolean);
   const goalImpact = overflow === 0 ? "Low" : tradeoffs.some((item) => Number(item.priority || 0) >= topGoalPriority) ? "High" : "Medium";
-  return { stats, overflow, alignment, focusDrift, capacityImpact, recommendation, tradeoffs, affectedGoals, goalImpact };
+  return { stats, overflow, alignment, focusDrift, capacityImpact, recommendation, tradeoffs, affectedGoals, goalImpact, opportunityImpact };
 }
 
 function findTradeoffs(opportunity, overflow) {
@@ -398,13 +618,13 @@ function renderEvaluation() {
   $("#selectedOpportunityLabel").textContent = selected.title;
   const evaluation = evaluateOpportunity(selected);
   const commitmentLoad = state.commitments
-    .map((item) => `<li>${escapeHtml(item.name)}: ${hours(item.weeklyHours)}/week, priority ${item.priority || 5}, ${escapeHtml(item.status || "active")}</li>`)
+    .map((item) => `<li>${escapeHtml(item.name)}: ${timeLabel(item)}, weekly impact ${hours(weeklyImpact(item))}, priority ${item.priority || 5}, ${escapeHtml(item.status || "active")}</li>`)
     .join("");
   const impacts = selected.expectedImpact?.length
     ? selected.expectedImpact.map((item) => `<li>${escapeHtml(item)}</li>`).join("")
     : "<li>No explicit benefits entered yet.</li>";
   const tradeoffs = evaluation.tradeoffs.length
-    ? evaluation.tradeoffs.map((item) => `<li>${escapeHtml(item.name)} may lose up to ${hours(Math.min(item.weeklyHours, evaluation.overflow))}/week because remaining capacity is insufficient.</li>`).join("")
+    ? evaluation.tradeoffs.map((item) => `<li>${escapeHtml(item.name)} may lose up to ${hours(Math.min(weeklyImpact(item), evaluation.overflow))} this week because remaining capacity is insufficient.</li>`).join("")
     : "<li>No delay predicted from current capacity.</li>";
   const affectedGoals = evaluation.affectedGoals.length
     ? evaluation.affectedGoals.map((goal) => `<li>${escapeHtml(goal.name)} - predicted impact ${evaluation.goalImpact}</li>`).join("")
@@ -426,6 +646,8 @@ function renderEvaluation() {
       <div class="eval-stat"><span>Capacity Impact</span><strong>${evaluation.capacityImpact}</strong></div>
       <div class="eval-stat"><span>Focus Drift</span><strong>${evaluation.focusDrift}</strong></div>
       <div class="eval-stat"><span>Money Cost</span><strong>${money(selected.moneyCost, selected.currency || "IDR")}</strong></div>
+      <div class="eval-stat"><span>Opportunity Time</span><strong>${timeLabel(selected)}</strong></div>
+      <div class="eval-stat ${dangerClass}"><span>Weekly Impact</span><strong>${hours(evaluation.opportunityImpact)}</strong></div>
       <div class="eval-stat"><span>Current Load</span><strong>${hours(evaluation.stats.allocated)} / ${hours(evaluation.stats.capacity)}</strong></div>
       <div class="eval-stat ${dangerClass}"><span>After Accept</span><strong>${hours(evaluation.stats.projected)} / ${hours(evaluation.stats.capacity)}</strong></div>
       <div class="eval-stat ${dangerClass}"><span>Projected Use</span><strong>${evaluation.stats.projectedUtilization}%</strong></div>
@@ -496,7 +718,8 @@ function opportunityFromData(data, existing = {}) {
     title: data.title,
     description: data.description,
     category: data.category,
-    weeklyHours: Number(data.weeklyHours),
+    timeAmount: Number(data.timeAmount),
+    timeUnit: data.timeUnit,
     durationAmount: Number(data.durationAmount),
     durationUnit: data.durationUnit,
     moneyCost: Number(data.moneyCost),
@@ -513,7 +736,8 @@ function fillOpportunityForm(opportunity) {
   form.elements.title.value = opportunity.title || "";
   form.elements.description.value = opportunity.description || "";
   form.elements.category.value = opportunity.category || "academy";
-  form.elements.weeklyHours.value = opportunity.weeklyHours ?? 4;
+  form.elements.timeAmount.value = opportunity.timeAmount ?? opportunity.weeklyHours ?? 4;
+  form.elements.timeUnit.value = opportunity.timeUnit || "per_week";
   form.elements.durationAmount.value = opportunity.durationAmount ?? opportunity.durationWeeks ?? 1;
   form.elements.durationUnit.value = opportunity.durationUnit || "week";
   form.elements.currency.value = opportunity.currency || "IDR";
@@ -573,7 +797,8 @@ $("#commitmentForm").addEventListener("submit", (event) => {
       id: makeId(),
       goalId: data.goalId,
       name: data.name,
-      weeklyHours: Number(data.weeklyHours),
+      timeAmount: Number(data.timeAmount),
+      timeUnit: data.timeUnit,
       priority: Number(data.priority),
       startDate: data.startDate,
       endDate: data.endDate,
@@ -581,6 +806,12 @@ $("#commitmentForm").addEventListener("submit", (event) => {
       notes: data.notes
     });
   });
+});
+
+$("#loadDummyData").addEventListener("click", () => {
+  state = createDummyState();
+  render();
+  setView("opportunities");
 });
 
 $("#opportunityForm").addEventListener("submit", (event) => {

@@ -61,7 +61,7 @@ Examples:
 Fields:
 
 - Name
-- Weekly Hours
+- Time Cost, with flexible unit such as per day, per week, or per month
 - Start Date
 - End Date, optional
 - Priority
@@ -82,7 +82,7 @@ Fields:
 
 - Title
 - Description
-- Expected Weekly Hours
+- Expected Time Cost, with flexible unit such as total, per day, per week, or per month
 - Duration, with flexible unit such as days, weeks, or months
 - Cost
 - Deadline
@@ -156,7 +156,7 @@ System simulates:
 Example:
 
 - Opportunity: PM Academy
-- Required: 8h/week
+- Required: 8h/week equivalent
 - Current Remaining: 5h/week
 - Result: Overflow 3h/week
 
