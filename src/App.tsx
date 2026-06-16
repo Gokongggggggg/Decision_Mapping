@@ -35,8 +35,8 @@ import type { AppState, Commitment, DurationUnit, Opportunity, OpportunityStatus
 const STORAGE_KEY = "opportunity-os-react-state-v1";
 
 const navItems = [
-  { id: "opportunities", label: "Opportunities", icon: Inbox },
   { id: "dashboard", label: "Dashboard", icon: Gauge },
+  { id: "opportunities", label: "Opportunities", icon: Inbox },
   { id: "goals", label: "Goals", icon: Target }
 ] as const;
 
@@ -64,7 +64,8 @@ const blankGoal = {
   description: "",
   priority: 8,
   deadline: "",
-  successMetrics: ""
+  successMetrics: "",
+  focusPercentage: 20
 };
 
 const blankCommitment = {
@@ -91,7 +92,7 @@ function loadState(): AppState {
 
 export default function App() {
   const [mode, setMode] = useState<Mode>("landing");
-  const [view, setView] = useState<View>("opportunities");
+  const [view, setView] = useState<View>("dashboard");
   const [state, setState] = useState<AppState>(loadState);
   const [editingOpportunityId, setEditingOpportunityId] = useState<string | null>(null);
   const [opportunityForm, setOpportunityForm] = useState(blankOpportunity);
@@ -109,7 +110,7 @@ export default function App() {
   const pending = state.opportunities.filter((item) => item.status === "pending_review");
   const recent = state.opportunities.filter((item) => item.status !== "pending_review").slice(-5).reverse();
 
-  function openApp(nextView: View = "opportunities") {
+  function openApp(nextView: View = "dashboard") {
     setMode("app");
     setView(nextView);
   }
@@ -148,6 +149,7 @@ export default function App() {
 
   function editOpportunity(opportunity: Opportunity) {
     setEditingOpportunityId(opportunity.id);
+    setState((current) => ({ ...current, selectedOpportunityId: opportunity.id }));
     setOpportunityForm({
       title: opportunity.title,
       description: opportunity.description,
@@ -161,14 +163,14 @@ export default function App() {
       deadline: opportunity.deadline,
       notes: opportunity.notes,
       alignmentScore: opportunity.alignmentScore,
-      expectedImpact: opportunity.expectedImpact.join(", ")
+      expectedImpact: opportunity.expectedImpact.map((item) => `- ${item}`).join("\n")
     });
   }
 
   function setDecision(id: string, status: Exclude<OpportunityStatus, "pending_review">) {
     setState((current) => ({
       ...current,
-      opportunities: current.opportunities.map((item) => (item.id === id ? { ...item, status } : item))
+      opportunities: current.opportunities.map((item) => (item.id === id ? { ...item, status, decisionDate: new Date().toISOString().split("T")[0] } : item))
     }));
   }
 
@@ -184,7 +186,8 @@ export default function App() {
           priority: Number(goalForm.priority),
           deadline: goalForm.deadline,
           successMetrics: splitList(goalForm.successMetrics),
-          status: "active"
+          status: "active",
+          focusPercentage: Number(goalForm.focusPercentage)
         },
         ...current.goals
       ]
@@ -220,67 +223,67 @@ export default function App() {
   }
 
   return (
-    <div className="app-bg min-h-screen text-[#111317]">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-black/10 bg-white/75 p-5 shadow-[18px_0_60px_rgba(17,19,23,0.06)] backdrop-blur-xl lg:flex lg:flex-col">
-        <button className="flex items-center gap-3 text-left" onClick={() => setMode("landing")}>
-          <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-lime-300 text-lg font-black text-zinc-950 shadow-lg shadow-cyan-500/20">O</span>
+    <div className="app-bg min-h-screen text-[#18181b]">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-zinc-200/60 bg-white/60 p-6 shadow-[20px_0_60px_rgba(15,17,21,0.03)] backdrop-blur-2xl lg:flex lg:flex-col">
+        <button className="flex items-center gap-3 text-left hover-lift" onClick={() => setMode("landing")}>
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 text-lg font-black text-white shadow-lg shadow-cyan-500/25">O</span>
           <span>
-            <span className="block text-xs font-black uppercase text-zinc-500">Opportunity OS</span>
-            <span className="block text-lg font-black">Decision Console</span>
+            <span className="block text-[10px] font-black uppercase tracking-wider text-zinc-400">Opportunity OS</span>
+            <span className="block text-lg font-black tracking-tight text-zinc-900">Decision Console</span>
           </span>
         </button>
 
-        <nav className="mt-8 grid gap-2">
+        <nav className="mt-10 grid gap-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = view === item.id;
             return (
               <button
                 key={item.id}
-                className={`flex items-center justify-between rounded-xl px-3 py-3 text-left text-sm font-black transition ${
-                  active ? "bg-cyan-50 text-cyan-900 ring-1 ring-cyan-200" : "text-zinc-600 hover:bg-white hover:text-zinc-950"
+                className={`group flex items-center justify-between rounded-xl px-4 py-3.5 text-left text-sm font-bold transition-all ${
+                  active ? "bg-cyan-50 text-cyan-700 ring-1 ring-cyan-500/20 shadow-sm" : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                 }`}
                 onClick={() => setView(item.id)}
               >
                 <span className="flex items-center gap-3">
-                  <Icon size={18} />
+                  <Icon size={18} className={active ? "text-cyan-600" : "text-zinc-400 group-hover:text-zinc-600"} />
                   {item.label}
                 </span>
-                {active ? <ArrowRight size={16} /> : null}
+                {active ? <ArrowRight size={16} className="text-cyan-600" /> : null}
               </button>
             );
           })}
         </nav>
 
-        <div className="mt-auto grid gap-3">
-          <button className="soft-shimmer rounded-xl bg-[#111317] px-4 py-3 text-sm font-black text-white shadow-lg shadow-zinc-950/15" onClick={() => setState(demoState)}>
+        <div className="mt-auto grid gap-4">
+          <button className="soft-shimmer rounded-xl bg-[#0f1115] px-4 py-3.5 text-sm font-bold text-white shadow-xl shadow-zinc-900/10 hover:shadow-zinc-900/20" onClick={() => setState(demoState)}>
             Load Demo Workspace
           </button>
-          <div className="surface-card rounded-2xl p-4">
-            <p className="text-xs font-black uppercase text-zinc-500">Weekly Capacity</p>
-            <div className="mt-2 flex items-center gap-2">
+          <div className="surface-card rounded-2xl p-5 border-zinc-200/50 bg-white/80">
+            <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Weekly Capacity</p>
+            <div className="mt-3 flex items-center gap-3">
               <input
-                className="h-11 w-24 rounded-xl border border-zinc-200 px-3 font-black"
+                className="h-12 w-28 rounded-xl border border-zinc-200 bg-white px-4 font-black shadow-sm text-lg"
                 type="number"
                 min={1}
                 max={168}
                 value={state.weeklyCapacity}
                 onChange={(event) => setState((current) => ({ ...current, weeklyCapacity: Number(event.target.value) }))}
               />
-              <span className="font-black text-zinc-500">hours</span>
+              <span className="font-bold text-zinc-400">hours</span>
             </div>
           </div>
         </div>
       </aside>
 
       <main className="lg:pl-72">
-        <header className="sticky top-0 z-20 border-b border-black/10 bg-white/68 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <header className="sticky top-0 z-20 border-b border-zinc-200/60 bg-white/60 px-6 py-5 backdrop-blur-2xl lg:px-10">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-black uppercase text-cyan-700">MVP v0.2</p>
-              <h1 className="text-3xl font-black tracking-tight lg:text-4xl">{navItems.find((item) => item.id === view)?.label}</h1>
+              <p className="text-[10px] font-black uppercase tracking-wider text-cyan-600">MVP v0.3</p>
+              <h1 className="text-3xl font-black tracking-tight text-zinc-900 lg:text-4xl">{navItems.find((item) => item.id === view)?.label}</h1>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex">
+            <div className="grid grid-cols-2 gap-3 sm:flex">
               <MetricPill label="Allocated" value={hours(stats.allocated)} />
               <MetricPill label="Remaining" value={hours(stats.remaining)} tone={stats.remaining < 0 ? "bad" : "good"} />
               <MetricPill label="Utilization" value={`${stats.utilization}%`} tone={stats.utilization > 100 ? "bad" : stats.utilization >= 85 ? "warn" : "good"} />
@@ -288,7 +291,7 @@ export default function App() {
           </div>
         </header>
 
-        <div className="p-4 sm:p-6 lg:p-8">
+        <div className="p-6 lg:p-10">
           {view === "opportunities" ? (
             <OpportunityWorkspace
               state={state}
@@ -315,7 +318,20 @@ export default function App() {
             />
           ) : null}
 
-          {view === "dashboard" ? <Dashboard state={state} stats={stats} pending={pending} recent={recent} openOpportunities={() => setView("opportunities")} /> : null}
+          {view === "dashboard" ? (
+            <Dashboard
+              state={state}
+              stats={stats}
+              pending={pending}
+              recent={recent}
+              openOpportunities={() => setView("opportunities")}
+              openGoals={() => setView("goals")}
+              reviewOpportunity={(id) => {
+                setState((current) => ({ ...current, selectedOpportunityId: id }));
+                setView("opportunities");
+              }}
+            />
+          ) : null}
 
           {view === "goals" ? (
             <GoalsWorkspace
@@ -344,71 +360,81 @@ export default function App() {
 
 function LandingPage({ onOpenApp }: { onOpenApp: (view?: View) => void }) {
   return (
-    <div className="landing-shell min-h-screen overflow-hidden text-[#111317]">
-      <header className="relative z-10 flex items-center justify-between px-5 py-5 lg:px-10">
-        <button className="flex items-center gap-3 text-left" onClick={() => onOpenApp("opportunities")}>
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-lime-300 font-black text-zinc-950 shadow-lg shadow-cyan-500/20">O</span>
-          <span className="font-black">Opportunity OS</span>
+    <div className="landing-shell min-h-screen overflow-hidden text-[#18181b]">
+      <header className="relative z-10 flex items-center justify-between px-6 py-6 lg:px-12">
+        <button className="flex items-center gap-3 text-left hover-lift" onClick={() => onOpenApp("dashboard")}>
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 font-black text-white shadow-lg shadow-cyan-500/20">O</span>
+          <span className="font-black tracking-tight text-lg">Opportunity OS</span>
         </button>
-        <nav className="hidden items-center gap-2 rounded-full border border-black/10 bg-white/70 p-1 shadow-lg shadow-zinc-950/5 backdrop-blur md:flex">
-          <a className="rounded-full px-4 py-2 text-sm font-black text-zinc-600" href="#engine">Engine</a>
-          <a className="rounded-full px-4 py-2 text-sm font-black text-zinc-600" href="#workflow">Workflow</a>
-          <button className="rounded-full bg-[#111317] px-4 py-2 text-sm font-black text-white" onClick={() => onOpenApp("opportunities")}>
+        <nav className="hidden items-center gap-2 rounded-full border border-zinc-200/50 bg-white/60 p-1.5 shadow-lg shadow-zinc-900/5 backdrop-blur-md md:flex">
+          <a className="rounded-full px-5 py-2 text-sm font-bold text-zinc-600 hover:bg-white hover:text-zinc-900 transition-colors" href="#engine">Engine</a>
+          <a className="rounded-full px-5 py-2 text-sm font-bold text-zinc-600 hover:bg-white hover:text-zinc-900 transition-colors" href="#workflow">Workflow</a>
+          <button className="rounded-full bg-[#0f1115] px-5 py-2 text-sm font-bold text-white shadow-md hover:shadow-lg transition-all" onClick={() => onOpenApp("dashboard")}>
             Open App
           </button>
         </nav>
       </header>
 
-      <section className="relative z-10 grid min-h-[calc(100vh-84px)] items-center gap-10 px-5 pb-12 pt-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-10">
-        <div className="reveal max-w-3xl">
-          <p className="mb-4 text-xs font-black uppercase text-cyan-700">Decision support for ambitious people</p>
-          <h1 className="gradient-text text-6xl font-black leading-[0.9] tracking-tight sm:text-7xl lg:text-8xl">Know the cost before saying yes.</h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
+      <section className="relative z-10 grid min-h-[calc(100vh-96px)] items-center gap-12 px-6 pb-16 pt-10 lg:grid-cols-[1fr_1.1fr] lg:px-12 xl:gap-20">
+        <div className="reveal max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 mb-6 shadow-sm">
+            <span className="flex h-2 w-2 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+            <p className="text-[10px] font-black uppercase tracking-wider text-cyan-700">Decision support for ambitious people</p>
+          </div>
+          <h1 className="gradient-text text-6xl font-black leading-[0.95] tracking-tight sm:text-7xl lg:text-[5.5rem] xl:text-[6.5rem]">
+            Know the cost before saying yes.
+          </h1>
+          <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-500 font-medium">
             Evaluate incoming academies, competitions, certifications, projects, internships, and startup ideas against the goals and commitments already fighting for your capacity.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button className="soft-shimmer rounded-xl bg-[#111317] px-5 py-4 font-black text-white shadow-xl shadow-zinc-950/20" onClick={() => onOpenApp("opportunities")}>
-              Open Opportunity OS
+          <div className="mt-10 flex flex-wrap gap-4">
+            <button className="soft-shimmer rounded-2xl bg-[#0f1115] px-7 py-4 text-base font-bold text-white shadow-xl shadow-zinc-900/15 hover:shadow-zinc-900/25 transition-all" onClick={() => onOpenApp("dashboard")}>
+              Open Dashboard
             </button>
-            <button className="rounded-xl border border-black/10 bg-white/75 px-5 py-4 font-black text-zinc-900 shadow-lg shadow-zinc-950/5 backdrop-blur" onClick={() => onOpenApp("dashboard")}>
-              View Dashboard
+            <button className="rounded-2xl border border-zinc-200/80 bg-white/60 px-7 py-4 text-base font-bold text-zinc-900 shadow-lg shadow-zinc-900/5 backdrop-blur-md hover:bg-white transition-all" onClick={() => onOpenApp("opportunities")}>
+              Add Opportunity
             </button>
           </div>
         </div>
 
-        <div className="surface-card float-panel reveal reveal-delay-1 rounded-[1.35rem] p-4">
-          <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-lg shadow-zinc-950/6">
-              <p className="text-[11px] font-black uppercase tracking-wide text-zinc-500">Opportunity Review</p>
-              <h2 className="mt-3 text-4xl font-black tracking-tight text-zinc-950">PM Academy</h2>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <PreviewStat label="Current Load" value="35h / 40h" />
-                <PreviewStat label="After Accept" value="43h / 40h" danger />
-                <PreviewStat label="Overflow" value="3h" danger />
-                <PreviewStat label="Decision" value="Defer" warn />
+        <div className="surface-card float-panel reveal reveal-delay-1 rounded-[2rem] p-5 shadow-[0_20px_80px_-20px_rgba(15,17,21,0.12)] border-white/40">
+          <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-[1.5rem] border border-zinc-100 bg-white p-7 shadow-xl shadow-zinc-900/5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 text-cyan-600">
+                <Target size={120} />
+              </div>
+              <div className="relative z-10">
+                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Opportunity Review</p>
+                <h2 className="mt-3 text-4xl font-black tracking-tight text-zinc-900">PM Academy</h2>
+                <div className="mt-8 grid grid-cols-2 gap-4">
+                  <PreviewStat label="Current Load" value="35h / 40h" />
+                  <PreviewStat label="After Accept" value="43h / 40h" danger />
+                  <PreviewStat label="Overflow" value="3h" danger />
+                  <PreviewStat label="Decision" value="Defer" warn />
+                </div>
               </div>
             </div>
-            <div className="grid gap-4">
-              <div className="rounded-2xl border border-black/10 bg-white p-5">
-                <p className="text-xs font-black uppercase text-zinc-500">Affected Commitments</p>
-                <div className="mt-4 grid gap-2">
+            <div className="grid gap-5">
+              <div className="rounded-[1.5rem] border border-zinc-100 bg-white/80 p-6 backdrop-blur-sm">
+                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Affected Commitments</p>
+                <div className="mt-4 grid gap-2.5">
                   {["CPTS progress", "HTB practice", "Portfolio project"].map((item) => (
-                    <div key={item} className="impact-pulse rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-black text-rose-700">
+                    <div key={item} className="impact-pulse rounded-xl border border-rose-100 bg-rose-50/80 px-4 py-2.5 text-xs font-bold text-rose-700">
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl border border-black/10 bg-white p-5">
-                <p className="text-xs font-black uppercase text-zinc-500">Decision Queue</p>
-                <div className="mt-4 space-y-2 text-sm font-black">
-                  <div className="flex justify-between rounded-xl bg-cyan-50 px-3 py-2 text-cyan-800">
+              <div className="rounded-[1.5rem] border border-zinc-100 bg-white/80 p-6 backdrop-blur-sm">
+                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Decision Queue</p>
+                <div className="mt-4 space-y-2.5 text-xs font-bold">
+                  <div className="flex justify-between items-center rounded-xl bg-cyan-50/80 px-4 py-2.5 text-cyan-800 border border-cyan-100">
                     <span>One-Day CTF</span>
-                    <span>9h total</span>
+                    <span className="bg-white rounded-md px-2 py-1 shadow-sm">9h total</span>
                   </div>
-                  <div className="flex justify-between rounded-xl bg-zinc-100 px-3 py-2">
+                  <div className="flex justify-between items-center rounded-xl bg-zinc-50 px-4 py-2.5 border border-zinc-100 text-zinc-600">
                     <span>SMT Korea</span>
-                    <span>20h total</span>
+                    <span className="bg-white rounded-md px-2 py-1 shadow-sm">20h total</span>
                   </div>
                 </div>
               </div>
@@ -417,21 +443,26 @@ function LandingPage({ onOpenApp }: { onOpenApp: (view?: View) => void }) {
         </div>
       </section>
 
-      <section id="engine" className="surface-card reveal reveal-delay-2 relative z-10 mx-5 mb-5 rounded-[1.35rem] p-6 lg:mx-10 lg:p-10">
+      <section id="engine" className="surface-card reveal reveal-delay-2 relative z-10 mx-6 mb-12 rounded-[2.5rem] p-8 lg:mx-12 lg:p-16 border-white/40 shadow-xl shadow-zinc-900/5">
         <div className="max-w-3xl">
-          <p className="text-xs font-black uppercase text-cyan-700">Review Engine</p>
-          <h2 className="mt-3 text-4xl font-black tracking-tight lg:text-6xl">Turn vague opportunity cost into a visible trade-off.</h2>
+          <p className="text-[10px] font-black uppercase tracking-wider text-cyan-600">Review Engine</p>
+          <h2 className="mt-4 text-4xl font-black tracking-tight lg:text-[4rem] leading-[1.1]">Turn vague opportunity cost into a visible trade-off.</h2>
         </div>
-        <div className="mt-8 grid gap-4 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {[
-            ["Capture", "Store opportunities with flexible time units, duration, cost, deadline, and expected gain."],
-            ["Normalize", "Convert per-day, per-week, per-month, and total time into weekly impact."],
-            ["Decide", "See affected commitments and goal impact before accepting, rejecting, or deferring."]
-          ].map(([title, body], index) => (
-            <div key={title} className="surface-card rounded-2xl p-5">
-              <span className="text-sm font-black text-cyan-700">0{index + 1}</span>
-              <h3 className="mt-5 text-xl font-black">{title}</h3>
-              <p className="mt-2 leading-7 text-zinc-600">{body}</p>
+            ["Capture", "Store opportunities with flexible time units, duration, cost, deadline, and expected gain.", Layers3],
+            ["Normalize", "Convert per-day, per-week, per-month, and total time into weekly impact.", Activity],
+            ["Decide", "See affected commitments and goal impact before accepting, rejecting, or deferring.", Target]
+          ].map(([title, body, Icon], index) => (
+            <div key={title as string} className="rounded-[1.5rem] bg-white/60 p-8 border border-zinc-200/50 hover:bg-white transition-colors duration-300">
+              <div className="flex items-center justify-between">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600">
+                  <Icon size={20} />
+                </span>
+                <span className="text-sm font-black text-zinc-300">0{index + 1}</span>
+              </div>
+              <h3 className="mt-6 text-xl font-black tracking-tight">{title as string}</h3>
+              <p className="mt-3 leading-relaxed text-zinc-500 font-medium text-sm">{body as string}</p>
             </div>
           ))}
         </div>
@@ -455,30 +486,48 @@ function OpportunityWorkspace(props: {
   onDecision: (id: string, status: Exclude<OpportunityStatus, "pending_review">) => void;
 }) {
   const { state, opportunityForm, setOpportunityForm, editingOpportunityId, submitOpportunity, cancelEdit, selectedOpportunity, evaluation } = props;
+  const expectedGains = opportunityForm.expectedImpact.length
+    ? opportunityForm.expectedImpact.split("\n").map((item) => item.replace(/^[-*•]\s*/, ""))
+    : [""];
+
+  function updateExpectedGain(index: number, value: string) {
+    const next = [...expectedGains];
+    next[index] = value;
+    setOpportunityForm({ ...opportunityForm, expectedImpact: next.join("\n") });
+  }
+
+  function addExpectedGain() {
+    setOpportunityForm({ ...opportunityForm, expectedImpact: [...expectedGains, ""].join("\n") });
+  }
+
+  function removeExpectedGain(index: number) {
+    const next = expectedGains.filter((_, itemIndex) => itemIndex !== index);
+    setOpportunityForm({ ...opportunityForm, expectedImpact: (next.length ? next : [""]).join("\n") });
+  }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[420px_minmax(360px,0.9fr)_minmax(420px,1.1fr)]">
-      <form className="surface-card reveal rounded-2xl p-5 xl:sticky xl:top-32 xl:self-start" onSubmit={(event) => submitOpportunity(event, "later")}>
-        <div className="flex items-start justify-between gap-3">
+    <div className="grid gap-6 xl:grid-cols-[440px_minmax(380px,0.9fr)_minmax(440px,1.1fr)]">
+      <form className="surface-card reveal rounded-[2rem] p-6 lg:p-8 xl:sticky xl:top-32 xl:self-start border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)]" onSubmit={(event) => submitOpportunity(event, "later")}>
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase text-cyan-700">Capture</p>
-            <h2 className="text-2xl font-black">{editingOpportunityId ? "Edit Opportunity" : "New Opportunity"}</h2>
+            <p className="text-[10px] font-black uppercase tracking-wider text-cyan-600">Capture</p>
+            <h2 className="text-2xl font-black tracking-tight">{editingOpportunityId ? "Edit Opportunity" : "New Opportunity"}</h2>
           </div>
           {editingOpportunityId ? (
-            <button className="rounded-xl bg-zinc-100 p-2" type="button" onClick={cancelEdit}>
+            <button className="rounded-xl bg-zinc-100 p-2 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 transition-colors" type="button" onClick={cancelEdit}>
               <X size={18} />
             </button>
           ) : null}
         </div>
 
-        <div className="mt-5 grid gap-4">
+        <div className="mt-6 grid gap-5">
           <Field label="Title">
-            <input required value={opportunityForm.title} onChange={(event) => setOpportunityForm({ ...opportunityForm, title: event.target.value })} placeholder="PM Academy" />
+            <input required value={opportunityForm.title} onChange={(event) => setOpportunityForm({ ...opportunityForm, title: event.target.value })} placeholder="e.g., PM Academy" />
           </Field>
           <Field label="Description">
-            <textarea value={opportunityForm.description} onChange={(event) => setOpportunityForm({ ...opportunityForm, description: event.target.value })} placeholder="What is this opportunity about?" />
+            <textarea value={opportunityForm.description} onChange={(event) => setOpportunityForm({ ...opportunityForm, description: event.target.value })} placeholder="What does this entail?" />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Field label="Category">
               <select value={opportunityForm.category} onChange={(event) => setOpportunityForm({ ...opportunityForm, category: event.target.value })}>
                 {["internship", "academy", "competition", "certification", "startup idea", "networking"].map((item) => (
@@ -490,9 +539,9 @@ function OpportunityWorkspace(props: {
               <input type="date" value={opportunityForm.deadline} onChange={(event) => setOpportunityForm({ ...opportunityForm, deadline: event.target.value })} />
             </Field>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Field label="Time required">
-              <div className="grid grid-cols-[1fr_120px] gap-2">
+              <div className="grid grid-cols-[1fr_110px] gap-2">
                 <input type="number" min={0} step={0.5} value={opportunityForm.timeAmount} onChange={(event) => setOpportunityForm({ ...opportunityForm, timeAmount: Number(event.target.value) })} />
                 <select value={opportunityForm.timeUnit} onChange={(event) => setOpportunityForm({ ...opportunityForm, timeUnit: event.target.value as TimeUnit })}>
                   <option value="total">Total</option>
@@ -503,7 +552,7 @@ function OpportunityWorkspace(props: {
               </div>
             </Field>
             <Field label="Duration">
-              <div className="grid grid-cols-[1fr_120px] gap-2">
+              <div className="grid grid-cols-[1fr_110px] gap-2">
                 <input type="number" min={1} step={1} value={opportunityForm.durationAmount} onChange={(event) => setOpportunityForm({ ...opportunityForm, durationAmount: Number(event.target.value) })} />
                 <select value={opportunityForm.durationUnit} onChange={(event) => setOpportunityForm({ ...opportunityForm, durationUnit: event.target.value as DurationUnit })}>
                   <option value="day">Days</option>
@@ -513,9 +562,9 @@ function OpportunityWorkspace(props: {
               </div>
             </Field>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Money cost">
-              <div className="grid grid-cols-[86px_1fr] gap-2">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Cost">
+              <div className="grid grid-cols-[80px_1fr] gap-2">
                 <select value={opportunityForm.currency} onChange={(event) => setOpportunityForm({ ...opportunityForm, currency: event.target.value })}>
                   {["IDR", "USD", "SGD", "EUR"].map((item) => (
                     <option key={item}>{item}</option>
@@ -524,37 +573,54 @@ function OpportunityWorkspace(props: {
                 <input type="number" min={0} value={opportunityForm.moneyCost} onChange={(event) => setOpportunityForm({ ...opportunityForm, moneyCost: Number(event.target.value) })} />
               </div>
             </Field>
-            <Field label="Alignment">
+            <Field label="Goal Alignment (1-10)">
               <input type="number" min={1} max={10} value={opportunityForm.alignmentScore} onChange={(event) => setOpportunityForm({ ...opportunityForm, alignmentScore: Number(event.target.value) })} />
             </Field>
           </div>
-          <Field label="Expected gain">
-            <input value={opportunityForm.expectedImpact} onChange={(event) => setOpportunityForm({ ...opportunityForm, expectedImpact: event.target.value })} placeholder="Network, certificate, product thinking" />
+          <Field label="Expected Gains">
+            <div className="grid gap-2">
+              {expectedGains.map((gain, index) => (
+                <div key={index} className="grid grid-cols-[1fr_auto] gap-2">
+                  <input value={gain} onChange={(event) => updateExpectedGain(index, event.target.value)} placeholder={index === 0 ? "e.g., Product thinking" : "Another gain"} />
+                  <button
+                    className="rounded-xl border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-400 shadow-sm hover:bg-rose-50 hover:text-rose-600"
+                    type="button"
+                    onClick={() => removeExpectedGain(index)}
+                    disabled={expectedGains.length === 1}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button className="mt-1 rounded-xl border border-cyan-100 bg-cyan-50 px-4 py-2 text-xs font-black text-cyan-700 shadow-sm hover:bg-cyan-100" type="button" onClick={addExpectedGain}>
+              + Add gain
+            </button>
           </Field>
           <Field label="Notes">
             <textarea value={opportunityForm.notes} onChange={(event) => setOpportunityForm({ ...opportunityForm, notes: event.target.value })} />
           </Field>
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <button className="rounded-xl border border-black/10 bg-white px-4 py-3 font-black shadow-sm" type="submit">
+        <div className="mt-8 grid grid-cols-2 gap-4">
+          <button className="rounded-xl border border-zinc-200/80 bg-white px-5 py-3.5 font-bold shadow-sm hover:bg-zinc-50 transition-colors" type="submit">
             Review Later
           </button>
-          <button className="soft-shimmer rounded-xl bg-[#111317] px-4 py-3 font-black text-white shadow-lg shadow-zinc-950/15" type="button" onClick={(event) => submitOpportunity(event as unknown as FormEvent<HTMLFormElement>, "now")}>
+          <button className="soft-shimmer rounded-xl bg-[#0f1115] px-5 py-3.5 font-bold text-white shadow-lg shadow-zinc-900/15 hover:shadow-xl hover:shadow-zinc-900/20 transition-all" type="button" onClick={(event) => submitOpportunity(event as unknown as FormEvent<HTMLFormElement>, "now")}>
             Review Now
           </button>
         </div>
       </form>
 
-      <section className="surface-card reveal reveal-delay-1 rounded-2xl p-5">
+      <section className="surface-card reveal reveal-delay-1 rounded-[2rem] p-6 lg:p-8 border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)]">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-black uppercase text-zinc-500">Queue</p>
-            <h2 className="text-2xl font-black">Opportunities</h2>
+            <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Queue</p>
+            <h2 className="text-2xl font-black tracking-tight">Opportunities</h2>
           </div>
-          <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-black">{state.opportunities.length} total</span>
+          <span className="rounded-full bg-cyan-50 text-cyan-700 px-3 py-1 text-[10px] font-black uppercase tracking-wider">{state.opportunities.length} total</span>
         </div>
-        <div className="mt-5 grid gap-3">
+        <div className="mt-6 grid gap-4">
           {state.opportunities.map((opportunity) => (
             <OpportunityCard key={opportunity.id} opportunity={opportunity} selected={selectedOpportunity?.id === opportunity.id} onSelect={props.onSelect} onEdit={props.onEdit} onDelete={props.onDelete} onDecision={props.onDecision} />
           ))}
@@ -569,11 +635,13 @@ function OpportunityWorkspace(props: {
 function ReviewPanel({ evaluation, state }: { evaluation: ReturnType<typeof evaluateOpportunity> | null; state: AppState }) {
   if (!evaluation) {
     return (
-      <section className="surface-card reveal reveal-delay-2 grid min-h-[520px] place-items-center rounded-2xl border-dashed p-8 text-center">
+      <section className="surface-card reveal reveal-delay-2 grid min-h-[520px] place-items-center rounded-[2rem] border-dashed border-zinc-300/80 bg-zinc-50/50 p-8 text-center border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)]">
         <div>
-          <Inbox className="mx-auto text-zinc-400" size={42} />
-          <h2 className="mt-4 text-2xl font-black">Select an opportunity to review</h2>
-          <p className="mt-2 max-w-md text-zinc-600">Review Now opens the impact engine. Review Later stores the opportunity in the queue.</p>
+          <div className="mx-auto w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-6">
+            <Inbox className="text-zinc-400" size={28} />
+          </div>
+          <h2 className="text-2xl font-black tracking-tight">Select an opportunity to review</h2>
+          <p className="mt-3 max-w-md text-zinc-500 font-medium">Review Now opens the impact engine. Review Later stores the opportunity in the queue.</p>
         </div>
       </section>
     );
@@ -583,48 +651,126 @@ function ReviewPanel({ evaluation, state }: { evaluation: ReturnType<typeof eval
   const tone = recommendationTone(evaluation.recommendation);
 
   return (
-    <section className="surface-card reveal reveal-delay-2 rounded-2xl p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <section className="surface-card reveal reveal-delay-2 rounded-[2rem] p-6 lg:p-8 border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)]">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase text-cyan-700">Opportunity Review</p>
-          <h2 className="text-3xl font-black tracking-tight">{evaluation.opportunity.title}</h2>
-          <p className="mt-2 text-zinc-600">{evaluation.opportunity.description || "No description provided."}</p>
+          <p className="text-[10px] font-black uppercase tracking-wider text-cyan-600">Opportunity Review</p>
+          <h2 className="mt-1 text-3xl font-black tracking-tight text-zinc-900">{evaluation.opportunity.title}</h2>
+          <p className="mt-3 text-zinc-500 font-medium leading-relaxed">{evaluation.opportunity.description || "No description provided."}</p>
         </div>
         <ToneBadge tone={tone}>{evaluation.recommendation}</ToneBadge>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <ReviewStat label="Alignment" value={`${evaluation.alignment}/10`} />
         <ReviewStat label="Opportunity Time" value={timeLabel(evaluation.opportunity)} />
         <ReviewStat label="Weekly Impact" value={hours(evaluation.opportunityImpact)} danger={danger} />
-        <ReviewStat label="Current Load" value={`${hours(evaluation.stats.allocated)} / ${hours(evaluation.stats.capacity)}`} />
-        <ReviewStat label="After Accept" value={`${hours(evaluation.stats.projected)} / ${hours(evaluation.stats.capacity)}`} danger={danger} />
-        <ReviewStat label="Overflow" value={hours(evaluation.overflow)} danger={danger} />
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <ImpactBlock title="Gain" items={evaluation.opportunity.expectedImpact.length ? evaluation.opportunity.expectedImpact : ["No explicit benefits entered yet."]} />
-        <ImpactBlock
-          title="Affected commitments"
-          danger={danger}
-          items={
-            evaluation.tradeoffs.length
-              ? evaluation.tradeoffs.map((item) => `${item.name} may lose up to ${hours(Math.min(weeklyImpact(item), evaluation.overflow))} this week`)
-              : ["No delay predicted from current capacity."]
-          }
-        />
-      </div>
+      <section className="mt-10">
+        <h3 className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Scenario Mode: Before vs After</h3>
+        <div className="mt-4 overflow-hidden rounded-[1.5rem] border border-zinc-200/60 bg-white/70 shadow-sm">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-zinc-50/80 font-bold text-zinc-500 border-b border-zinc-200/60">
+              <tr>
+                <th className="px-5 py-4">Metric</th>
+                <th className="px-5 py-4">Current State</th>
+                <th className="px-5 py-4">If Accepted</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100">
+              <tr className="hover:bg-zinc-50/50 transition-colors">
+                <td className="px-5 py-4 font-bold text-zinc-500">Total Hours</td>
+                <td className="px-5 py-4 font-black">{hours(evaluation.stats.allocated)}</td>
+                <td className={`px-5 py-4 font-black ${danger ? "text-rose-600" : "text-cyan-600"}`}>{hours(evaluation.stats.projected)}</td>
+              </tr>
+              <tr className="hover:bg-zinc-50/50 transition-colors">
+                <td className="px-5 py-4 font-bold text-zinc-500">Utilization</td>
+                <td className="px-5 py-4 font-black">{evaluation.stats.utilization}%</td>
+                <td className={`px-5 py-4 font-black ${evaluation.stats.projectedUtilization > 100 ? "text-rose-600" : "text-cyan-600"}`}>{evaluation.stats.projectedUtilization}%</td>
+              </tr>
+              <tr className="hover:bg-zinc-50/50 transition-colors">
+                <td className="px-5 py-4 font-bold text-zinc-500">Remaining</td>
+                <td className="px-5 py-4 font-black">{hours(evaluation.stats.remaining)}</td>
+                <td className={`px-5 py-4 font-black ${evaluation.overflow > 0 ? "text-rose-600" : "text-emerald-600"}`}>{hours(Math.max(0, evaluation.stats.capacity - evaluation.stats.projected))}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
-        <h3 className="font-black">Current commitments benchmark</h3>
-        <div className="mt-3 grid gap-2">
-          {state.commitments.map((item) => (
-            <div key={item.id} className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm ${danger ? "impact-pulse border border-rose-200 bg-rose-50 text-rose-800" : "bg-white"}`}>
-              <span className="font-black">{item.name}</span>
-              <span className="text-zinc-500">{hours(weeklyImpact(item))} weekly impact</span>
+      {evaluation.adjustmentPlans.length > 0 && (
+        <section className="mt-10">
+          <div className="flex items-center gap-3 text-amber-600">
+            <div className="p-2 bg-amber-50 rounded-xl">
+              <AlertTriangle size={18} />
+            </div>
+            <h3 className="text-[10px] font-black uppercase tracking-wider">Adjustment Planner: Required Changes</h3>
+          </div>
+          <div className="mt-5 grid gap-4">
+            {evaluation.adjustmentPlans.map((plan) => (
+              <div key={plan.commitmentId} className="flex items-center justify-between rounded-[1.5rem] border border-amber-200/60 bg-amber-50/50 p-5 hover:bg-amber-50 transition-colors">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-amber-600/80">Reduce {plan.commitmentName}</p>
+                  <p className="mt-2 text-xl font-black text-amber-900 tracking-tight">
+                    {hours(plan.originalHours)} <span className="text-amber-400 mx-1">→</span> {hours(plan.reducedHours)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-amber-600/80">Saved</p>
+                  <p className="mt-2 text-xl font-black text-amber-600 tracking-tight">+{hours(plan.reduction)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="mt-10">
+        <h3 className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Focus Budget Impact</h3>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {evaluation.focusBudgets.map((budget) => (
+            <div key={budget.goalId} className="rounded-[1.5rem] border border-zinc-200/60 bg-white/70 p-5 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500">{budget.goalName}</span>
+                <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-wider ${
+                  budget.status === "Healthy" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : 
+                  budget.status === "Warning" ? "bg-amber-50 text-amber-700 border border-amber-100" : 
+                  "bg-rose-50 text-rose-700 border border-rose-100"
+                }`}>
+                  {budget.status}
+                </span>
+              </div>
+              <div className="mt-5 grid grid-cols-3 gap-3 text-center">
+                <div className="bg-zinc-50/80 rounded-xl p-2 border border-zinc-100">
+                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400">Budget</p>
+                  <p className="text-sm font-black mt-1 text-zinc-700">{budget.budgetedPercentage}%</p>
+                </div>
+                <div className="bg-zinc-50/80 rounded-xl p-2 border border-zinc-100">
+                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400">Current</p>
+                  <p className="text-sm font-black mt-1 text-zinc-700">{budget.currentPercentage}%</p>
+                </div>
+                <div className={`rounded-xl p-2 border ${budget.status !== "Healthy" ? "bg-rose-50/50 border-rose-100" : "bg-emerald-50/50 border-emerald-100"}`}>
+                  <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400">Projected</p>
+                  <p className={`text-sm font-black mt-1 ${budget.status !== "Healthy" ? "text-rose-600" : "text-emerald-600"}`}>{budget.projectedPercentage}%</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
+      </section>
+
+      <div className="mt-10 grid gap-5 lg:grid-cols-2">
+        <ImpactBlock title="Expected Gains" items={evaluation.opportunity.expectedImpact.length ? evaluation.opportunity.expectedImpact : ["No explicit benefits entered yet."]} />
+        <ImpactBlock
+          title="Trade-offs & Goal Impact"
+          danger={danger}
+          items={
+            evaluation.tradeoffs.length
+              ? evaluation.tradeoffs.map((item) => `${item.name} priority is ${item.priority}/10. Impact: ${evaluation.goalImpact} risk.`)
+              : ["No immediate risk to existing goals predicted."]
+          }
+        />
       </div>
     </section>
   );
@@ -640,96 +786,124 @@ function OpportunityCard(props: {
 }) {
   const { opportunity, selected } = props;
   return (
-    <article className={`rounded-2xl border p-4 transition ${selected ? "border-cyan-300 bg-cyan-50/80 shadow-lg shadow-cyan-500/10" : "border-black/10 bg-white/80 hover:border-cyan-200 hover:bg-white"}`}>
-      <div className="flex items-start justify-between gap-3">
+    <article
+      className={`cursor-pointer rounded-[1.5rem] border p-5 transition-all duration-300 ${
+        selected ? "border-cyan-300 bg-cyan-50/60 shadow-[0_8px_30px_-10px_rgba(6,182,212,0.2)] scale-[1.02]" : "border-zinc-200/60 bg-white/60 hover:border-cyan-200/60 hover:bg-white hover:shadow-md"
+      }`}
+      onClick={() => props.onSelect(opportunity.id)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") props.onSelect(opportunity.id);
+      }}
+    >
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-black">{opportunity.title}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{opportunity.description || "No description."}</p>
+          <h3 className="font-black text-lg tracking-tight">{opportunity.title}</h3>
+          <p className="mt-1.5 line-clamp-2 text-sm font-medium text-zinc-500 leading-relaxed">{opportunity.description || "No description."}</p>
         </div>
         <ToneBadge tone={recommendationTone(statusLabel(opportunity.status))}>{statusLabel(opportunity.status)}</ToneBadge>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         <Tag>{opportunity.category}</Tag>
         <Tag>{timeLabel(opportunity)}</Tag>
         <Tag>{durationLabel(opportunity)}</Tag>
         <Tag>{money(opportunity.moneyCost, opportunity.currency)}</Tag>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button className="rounded-xl bg-[#111317] px-3 py-2 text-xs font-black text-white" onClick={() => props.onSelect(opportunity.id)}>
+      <div className="mt-5 flex flex-wrap gap-2.5">
+        <button className="rounded-xl bg-[#0f1115] px-4 py-2 text-xs font-bold text-white shadow-sm hover:shadow-md" type="button" onClick={(event) => { event.stopPropagation(); props.onSelect(opportunity.id); }}>
           Review
         </button>
-        <button className="rounded-xl bg-zinc-100 px-3 py-2 text-xs font-black" onClick={() => props.onEdit(opportunity)}>
+        <button className="rounded-xl bg-white border border-zinc-200 px-4 py-2 text-xs font-bold text-zinc-600 shadow-sm hover:bg-zinc-50" type="button" onClick={(event) => { event.stopPropagation(); props.onEdit(opportunity); }}>
           Edit
         </button>
-        <button className="rounded-xl bg-emerald-50 px-3 py-2 text-xs font-black text-emerald-700" onClick={() => props.onDecision(opportunity.id, "accepted")}>
+        <button className="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-2 text-xs font-bold text-emerald-700 shadow-sm hover:bg-emerald-100" type="button" onClick={(event) => { event.stopPropagation(); props.onDecision(opportunity.id, "accepted"); }}>
           Accept
         </button>
-        <button className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-700" onClick={() => props.onDecision(opportunity.id, "deferred")}>
+        <button className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-2 text-xs font-bold text-amber-700 shadow-sm hover:bg-amber-100" type="button" onClick={(event) => { event.stopPropagation(); props.onDecision(opportunity.id, "deferred"); }}>
           Defer
         </button>
-        <button className="rounded-xl bg-red-50 px-3 py-2 text-xs font-black text-red-700" onClick={() => props.onDecision(opportunity.id, "rejected")}>
+        <button className="rounded-xl bg-rose-50 border border-rose-100 px-4 py-2 text-xs font-bold text-rose-700 shadow-sm hover:bg-rose-100" type="button" onClick={(event) => { event.stopPropagation(); props.onDecision(opportunity.id, "rejected"); }}>
           Reject
+        </button>
+        <button className="rounded-xl bg-white border border-rose-100 px-4 py-2 text-xs font-bold text-rose-600 shadow-sm hover:bg-rose-50" type="button" onClick={(event) => { event.stopPropagation(); props.onDelete(opportunity.id); }}>
+          Delete
         </button>
       </div>
     </article>
   );
 }
 
-function Dashboard({ state, stats, pending, recent, openOpportunities }: { state: AppState; stats: ReturnType<typeof capacityStats>; pending: Opportunity[]; recent: Opportunity[]; openOpportunities: () => void }) {
+function Dashboard({
+  state,
+  stats,
+  pending,
+  recent,
+  openOpportunities,
+  openGoals,
+  reviewOpportunity
+}: {
+  state: AppState;
+  stats: ReturnType<typeof capacityStats>;
+  pending: Opportunity[];
+  recent: Opportunity[];
+  openOpportunities: () => void;
+  openGoals: () => void;
+  reviewOpportunity: (id: string) => void;
+}) {
   return (
-    <div className="grid gap-5">
-      <div className="grid gap-4 md:grid-cols-4">
+    <div className="grid gap-6">
+      <div className="grid gap-5 md:grid-cols-4">
         <MetricCard icon={Clock3} label="Allocated" value={hours(stats.allocated)} helper={`${hours(stats.commitmentHours)} active commitments`} />
         <MetricCard icon={Gauge} label="Remaining" value={hours(stats.remaining)} helper="Available this week" danger={stats.remaining < 0} />
         <MetricCard icon={Activity} label="Utilization" value={`${stats.utilization}%`} helper={stats.utilization >= 85 ? "Near limit" : "Healthy load"} />
         <MetricCard icon={Inbox} label="Pending" value={String(pending.length)} helper="Needs review" />
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <section className="surface-card rounded-2xl p-5">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <section className="surface-card rounded-[2rem] p-6 lg:p-8 border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)]">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black">Current Focus</h2>
-            <Target className="text-cyan-700" />
+            <h2 className="text-2xl font-black tracking-tight">Current Focus</h2>
+            <Target className="text-cyan-600" />
           </div>
-          <div className="mt-4 grid gap-3">
+          <div className="mt-6 grid gap-4">
             {[...state.goals]
               .sort((a, b) => b.priority - a.priority)
               .slice(0, 3)
               .map((goal) => (
-                <div key={goal.id} className="rounded-2xl bg-zinc-50 p-4">
+                <button key={goal.id} className="w-full rounded-2xl border border-zinc-200/50 bg-white/80 p-5 text-left shadow-sm hover:border-cyan-200 hover:bg-white hover:shadow-md transition-all" type="button" onClick={openGoals}>
                   <div className="flex items-center justify-between">
-                    <strong>{goal.name}</strong>
+                    <strong className="text-lg font-black tracking-tight">{goal.name}</strong>
                     <Tag>Priority {goal.priority}</Tag>
                   </div>
-                  <p className="mt-1 text-sm text-zinc-600">{goal.deadline || "No deadline"}</p>
-                </div>
+                  <p className="mt-2 text-sm font-medium text-zinc-500">{goal.deadline || "No deadline"}</p>
+                </button>
               ))}
           </div>
         </section>
 
-        <section className="surface-card rounded-2xl p-5">
+        <section className="surface-card rounded-[2rem] p-6 lg:p-8 border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)]">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black">Decision Queue</h2>
-            <button className="rounded-xl bg-[#111317] px-3 py-2 text-sm font-black text-white" onClick={openOpportunities}>
+            <h2 className="text-2xl font-black tracking-tight">Decision Queue</h2>
+            <button className="rounded-xl bg-[#0f1115] px-4 py-2 text-sm font-bold text-white shadow-sm hover:shadow-md transition-all" onClick={openOpportunities}>
               Review
             </button>
           </div>
-          <div className="mt-4 grid gap-3">
-            {pending.length ? pending.map((item) => <OpportunityMini key={item.id} opportunity={item} />) : <EmptyText>No pending reviews.</EmptyText>}
+          <div className="mt-6 grid gap-4">
+            {pending.length ? pending.map((item) => <OpportunityMini key={item.id} opportunity={item} onClick={() => reviewOpportunity(item.id)} />) : <EmptyText>No pending reviews.</EmptyText>}
           </div>
         </section>
 
-        <section className="surface-card rounded-2xl p-5 lg:col-span-2">
-          <h2 className="text-2xl font-black">Recent Decisions</h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {recent.length ? recent.map((item) => <OpportunityMini key={item.id} opportunity={item} />) : <EmptyText>No decisions yet.</EmptyText>}
+        <section className="surface-card rounded-[2rem] p-6 lg:p-8 border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)] lg:col-span-2">
+          <h2 className="text-2xl font-black tracking-tight">Recent Decisions</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {recent.length ? recent.map((item) => <OpportunityMini key={item.id} opportunity={item} onClick={() => reviewOpportunity(item.id)} />) : <EmptyText>No decisions yet.</EmptyText>}
           </div>
         </section>
       </div>
     </div>
   );
 }
-
 function GoalsWorkspace(props: {
   state: AppState;
   goalForm: typeof blankGoal;
@@ -743,38 +917,41 @@ function GoalsWorkspace(props: {
 }) {
   const { state, goalForm, setGoalForm, commitmentForm, setCommitmentForm } = props;
   return (
-    <div className="grid gap-5 xl:grid-cols-[360px_360px_1fr]">
-      <form className="surface-card rounded-2xl p-5" onSubmit={props.addGoal}>
-        <h2 className="text-2xl font-black">Add Goal</h2>
-        <div className="mt-5 grid gap-4">
+    <div className="grid gap-6 xl:grid-cols-[380px_380px_1fr]">
+      <form className="surface-card rounded-[2rem] p-6 lg:p-8" onSubmit={props.addGoal}>
+        <h2 className="text-2xl font-black tracking-tight">Add Goal</h2>
+        <div className="mt-6 grid gap-5">
           <Field label="Name">
-            <input required value={goalForm.name} onChange={(event) => setGoalForm({ ...goalForm, name: event.target.value })} />
+            <input required value={goalForm.name} onChange={(event) => setGoalForm({ ...goalForm, name: event.target.value })} placeholder="e.g., Security Internship" />
           </Field>
           <Field label="Description">
-            <textarea value={goalForm.description} onChange={(event) => setGoalForm({ ...goalForm, description: event.target.value })} />
+            <textarea value={goalForm.description} onChange={(event) => setGoalForm({ ...goalForm, description: event.target.value })} placeholder="What are you trying to achieve?" />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Priority">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Priority (1-10)">
               <input type="number" min={1} max={10} value={goalForm.priority} onChange={(event) => setGoalForm({ ...goalForm, priority: Number(event.target.value) })} />
             </Field>
-            <Field label="Deadline">
-              <input type="date" value={goalForm.deadline} onChange={(event) => setGoalForm({ ...goalForm, deadline: event.target.value })} />
+            <Field label="Focus Budget (%)">
+              <input type="number" min={0} max={100} value={goalForm.focusPercentage} onChange={(event) => setGoalForm({ ...goalForm, focusPercentage: Number(event.target.value) })} />
             </Field>
           </div>
-          <Field label="Success Metrics">
-            <input value={goalForm.successMetrics} onChange={(event) => setGoalForm({ ...goalForm, successMetrics: event.target.value })} placeholder="Complete CPTS, Apply to internships" />
+          <Field label="Deadline">
+            <input type="date" value={goalForm.deadline} onChange={(event) => setGoalForm({ ...goalForm, deadline: event.target.value })} />
           </Field>
-          <button className="rounded-xl bg-[#111317] px-4 py-3 font-black text-white">Add Goal</button>
+          <Field label="Success Metrics">
+            <input value={goalForm.successMetrics} onChange={(event) => setGoalForm({ ...goalForm, successMetrics: event.target.value })} placeholder="Comma separated metrics" />
+          </Field>
+          <button className="rounded-xl bg-[#0f1115] px-5 py-3.5 font-bold text-white shadow-md mt-2 hover:shadow-lg transition-all">Add Goal</button>
         </div>
       </form>
 
-      <form className="surface-card rounded-2xl p-5" onSubmit={props.addCommitment}>
-        <h2 className="text-2xl font-black">Add Commitment</h2>
-        <div className="mt-5 grid gap-4">
+      <form className="surface-card rounded-[2rem] p-6 lg:p-8" onSubmit={props.addCommitment}>
+        <h2 className="text-2xl font-black tracking-tight">Add Commitment</h2>
+        <div className="mt-6 grid gap-5">
           <Field label="Name">
-            <input required value={commitmentForm.name} onChange={(event) => setCommitmentForm({ ...commitmentForm, name: event.target.value })} placeholder="CPTS, University, Gym" />
+            <input required value={commitmentForm.name} onChange={(event) => setCommitmentForm({ ...commitmentForm, name: event.target.value })} placeholder="e.g., CPTS Study, Gym" />
           </Field>
-          <Field label="Goal">
+          <Field label="Linked Goal">
             <select value={commitmentForm.goalId} onChange={(event) => setCommitmentForm({ ...commitmentForm, goalId: event.target.value })}>
               <option value="">General commitment</option>
               {state.goals.map((goal) => (
@@ -784,11 +961,11 @@ function GoalsWorkspace(props: {
               ))}
             </select>
           </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Time cost">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Time required">
               <input type="number" min={0} step={0.5} value={commitmentForm.timeAmount} onChange={(event) => setCommitmentForm({ ...commitmentForm, timeAmount: Number(event.target.value) })} />
             </Field>
-            <Field label="Unit">
+            <Field label="Frequency">
               <select value={commitmentForm.timeUnit} onChange={(event) => setCommitmentForm({ ...commitmentForm, timeUnit: event.target.value as Exclude<TimeUnit, "total"> })}>
                 <option value="per_day">Per day</option>
                 <option value="per_week">Per week</option>
@@ -796,38 +973,44 @@ function GoalsWorkspace(props: {
               </select>
             </Field>
           </div>
-          <Field label="Priority">
+          <Field label="Priority (1-10)">
             <input type="number" min={1} max={10} value={commitmentForm.priority} onChange={(event) => setCommitmentForm({ ...commitmentForm, priority: Number(event.target.value) })} />
           </Field>
-          <button className="rounded-xl bg-[#111317] px-4 py-3 font-black text-white">Add Commitment</button>
+          <button className="rounded-xl bg-[#0f1115] px-5 py-3.5 font-bold text-white shadow-md mt-2 hover:shadow-lg transition-all">Add Commitment</button>
         </div>
       </form>
 
-      <section className="surface-card rounded-2xl p-5">
-        <h2 className="text-2xl font-black">Goals & Commitments</h2>
-        <div className="mt-5 grid gap-4">
+      <section className="surface-card rounded-[2rem] p-6 lg:p-8 border-white/40 shadow-[0_10px_40px_-10px_rgba(15,17,21,0.06)]">
+        <h2 className="text-2xl font-black tracking-tight">Goals & Commitments</h2>
+        <div className="mt-6 grid gap-5">
           {state.goals.map((goal) => (
-            <article key={goal.id} className="rounded-2xl border border-zinc-200 p-4">
-              <div className="flex items-start justify-between gap-3">
+            <article key={goal.id} className="rounded-2xl border border-zinc-200/60 bg-white/70 p-5 shadow-sm">
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-black">{goal.name}</h3>
-                  <p className="mt-1 text-sm text-zinc-600">{goal.description}</p>
+                  <h3 className="font-black text-lg tracking-tight">{goal.name}</h3>
+                  <p className="mt-1 text-sm font-medium text-zinc-500 leading-relaxed">{goal.description}</p>
                 </div>
-                <button className="rounded-xl bg-red-50 p-2 text-red-700" onClick={() => props.deleteGoal(goal.id)}>
+                <button className="rounded-xl bg-white border border-rose-100 p-2 text-rose-600 shadow-sm hover:bg-rose-50 transition-colors" onClick={() => props.deleteGoal(goal.id)}>
                   <X size={16} />
                 </button>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <Tag>Priority {goal.priority}</Tag>
-                <Tag>{goal.deadline || "No deadline"}</Tag>
+                <Tag>Budget: {goal.focusPercentage}%</Tag>
+                {goal.deadline && <Tag>{goal.deadline}</Tag>}
               </div>
-              <div className="mt-4 grid gap-2">
+              <div className="mt-5 grid gap-2.5">
                 {state.commitments
                   .filter((item) => item.goalId === goal.id)
                   .map((commitment) => (
-                    <div key={commitment.id} className="flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2">
-                      <span className="text-sm font-black">{commitment.name}</span>
-                      <span className="text-xs font-black text-zinc-500">{hours(weeklyImpact(commitment))} weekly</span>
+                    <div key={commitment.id} className="flex items-center justify-between rounded-xl bg-zinc-50/80 px-4 py-2.5 border border-zinc-100">
+                      <span className="text-sm font-bold">{commitment.name}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-black text-zinc-400 bg-white px-2 py-1 rounded-md shadow-sm">{hours(weeklyImpact(commitment))} weekly</span>
+                        <button className="text-zinc-400 hover:text-rose-600 transition-colors" onClick={() => props.deleteCommitment(commitment.id)}>
+                          <X size={14} />
+                        </button>
+                      </div>
                     </div>
                   ))}
               </div>
@@ -849,44 +1032,46 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function MetricPill({ label, value, tone }: { label: string; value: string; tone?: "good" | "warn" | "bad" }) {
-  const toneClass = tone === "bad" ? "text-rose-700" : tone === "warn" ? "text-amber-700" : tone === "good" ? "text-lime-700" : "text-zinc-950";
+  const toneClass = tone === "bad" ? "text-rose-600" : tone === "warn" ? "text-amber-600" : tone === "good" ? "text-lime-600" : "text-zinc-900";
   return (
-    <div className="rounded-2xl border border-black/10 bg-white/78 px-4 py-3 shadow-sm backdrop-blur">
-      <p className="text-xs font-black uppercase text-zinc-500">{label}</p>
-      <p className={`text-xl font-black ${toneClass}`}>{value}</p>
+    <div className="rounded-2xl border border-zinc-200/60 bg-white/80 px-5 py-3 shadow-sm backdrop-blur hover:bg-white transition-colors">
+      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">{label}</p>
+      <p className={`text-xl font-black mt-0.5 ${toneClass}`}>{value}</p>
     </div>
   );
 }
 
 function MetricCard({ icon: Icon, label, value, helper, danger }: { icon: typeof Clock3; label: string; value: string; helper: string; danger?: boolean }) {
   return (
-    <article className="surface-card rounded-2xl p-5">
+    <article className="surface-card rounded-[1.5rem] p-6 hover-lift border-white/40">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-black uppercase text-zinc-500">{label}</p>
-        <Icon className={danger ? "text-rose-700" : "text-cyan-700"} size={20} />
+        <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">{label}</p>
+        <div className={`p-2 rounded-xl ${danger ? "bg-rose-50 text-rose-600" : "bg-cyan-50 text-cyan-600"}`}>
+          <Icon size={20} />
+        </div>
       </div>
-      <strong className={`mt-4 block text-4xl font-black ${danger ? "text-rose-700" : ""}`}>{value}</strong>
-      <p className="mt-2 text-sm font-bold text-zinc-500">{helper}</p>
+      <strong className={`mt-5 block text-4xl font-black tracking-tight ${danger ? "text-rose-600" : "text-zinc-900"}`}>{value}</strong>
+      <p className="mt-2 text-sm font-bold text-zinc-400">{helper}</p>
     </article>
   );
 }
 
 function ReviewStat({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
   return (
-    <div className={`rounded-2xl border p-4 ${danger ? "impact-pulse border-rose-200 bg-rose-50 text-rose-700" : "border-black/10 bg-white/75"}`}>
-      <p className="text-xs font-black uppercase opacity-70">{label}</p>
-      <strong className="mt-2 block text-2xl font-black">{value}</strong>
+    <div className={`rounded-2xl border p-5 transition-colors ${danger ? "impact-pulse border-rose-200 bg-rose-50/80 text-rose-700" : "border-zinc-200/60 bg-white/70 hover:bg-white"}`}>
+      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">{label}</p>
+      <strong className="mt-2 block text-2xl font-black tracking-tight">{value}</strong>
     </div>
   );
 }
 
 function ImpactBlock({ title, items, danger }: { title: string; items: string[]; danger?: boolean }) {
   return (
-    <div className="rounded-2xl border border-black/10 bg-white/68 p-4">
-      <h3 className="font-black">{title}</h3>
-      <div className="mt-3 grid gap-2">
+    <div className={`rounded-[1.5rem] border p-6 transition-colors ${danger ? "border-rose-200/60 bg-rose-50/30" : "border-zinc-200/60 bg-white/60"}`}>
+      <h3 className="font-black text-lg tracking-tight text-zinc-900">{title}</h3>
+      <div className="mt-4 grid gap-3">
         {items.map((item) => (
-          <div key={item} className={`rounded-xl px-3 py-2 text-sm font-bold ${danger ? "impact-pulse border border-rose-200 bg-rose-50 text-rose-700" : "bg-white text-zinc-700"}`}>
+          <div key={item} className={`rounded-xl px-4 py-3 text-sm font-bold shadow-sm ${danger ? "impact-pulse border border-rose-200 bg-rose-50 text-rose-700" : "bg-white text-zinc-600 border border-zinc-100"}`}>
             {item}
           </div>
         ))}
@@ -896,40 +1081,43 @@ function ImpactBlock({ title, items, danger }: { title: string; items: string[];
 }
 
 function ToneBadge({ tone, children }: { tone: string; children: ReactNode }) {
-  const className = tone === "good" ? "bg-lime-50 text-lime-700" : tone === "bad" ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700";
-  return <span className={`rounded-full px-3 py-1 text-xs font-black ${className}`}>{children}</span>;
+  const className = tone === "good" ? "bg-emerald-50 text-emerald-700 border-emerald-200/50" : tone === "bad" ? "bg-rose-50 text-rose-700 border-rose-200/50" : "bg-amber-50 text-amber-700 border-amber-200/50";
+  return <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider border ${className}`}>{children}</span>;
 }
 
 function Tag({ children }: { children: ReactNode }) {
-  return <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-zinc-600 ring-1 ring-black/10">{children}</span>;
+  return <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-500 border border-zinc-200 shadow-sm">{children}</span>;
 }
 
 function EmptyText({ children }: { children: ReactNode }) {
-  return <div className="rounded-2xl border border-dashed border-zinc-300 p-5 text-center text-sm font-black text-zinc-500">{children}</div>;
+  return <div className="rounded-2xl border border-dashed border-zinc-300/80 bg-zinc-50/50 p-6 text-center text-sm font-bold text-zinc-400">{children}</div>;
 }
 
-function OpportunityMini({ opportunity }: { opportunity: Opportunity }) {
+function OpportunityMini({ opportunity, onClick }: { opportunity: Opportunity; onClick?: () => void }) {
   return (
-    <div className="rounded-2xl border border-black/10 bg-white/75 p-4">
+    <button className="w-full rounded-2xl border border-zinc-200/60 bg-white/70 p-5 text-left shadow-sm hover:border-cyan-200 hover:bg-white hover:shadow-md transition-all" onClick={onClick} type="button">
       <div className="flex items-center justify-between">
-        <strong>{opportunity.title}</strong>
+        <strong className="text-sm font-black tracking-tight">{opportunity.title}</strong>
         <ToneBadge tone={recommendationTone(statusLabel(opportunity.status))}>{statusLabel(opportunity.status)}</ToneBadge>
       </div>
-      <p className="mt-2 text-sm text-zinc-500">
-        {timeLabel(opportunity)} / {durationLabel(opportunity)}
-      </p>
-    </div>
+      <div className="mt-3 flex items-center justify-between text-xs text-zinc-400 font-bold">
+        <span className="bg-white px-2 py-1 rounded-md border border-zinc-100">{timeLabel(opportunity)}</span>
+        {opportunity.decisionDate && <span>{opportunity.decisionDate}</span>}
+      </div>
+    </button>
   );
 }
 
 function PreviewStat({ label, value, danger, warn }: { label: string; value: string; danger?: boolean; warn?: boolean }) {
-  const accent = danger ? "border-l-rose-400" : warn ? "border-l-emerald-500" : "border-l-sky-400";
-  const valueTone = danger ? "text-rose-700" : warn ? "text-emerald-700" : "text-zinc-950";
+  const accent = danger ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]" : warn ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]" : "bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.4)]";
+  const valueTone = danger ? "text-rose-600" : warn ? "text-amber-600" : "text-zinc-900";
 
   return (
-    <div className={`min-h-[96px] rounded-xl border border-black/10 border-l-2 bg-zinc-50/80 px-4 py-3.5 shadow-sm ${accent}`}>
-      <p className="text-[11px] font-black uppercase tracking-wide text-zinc-500">{label}</p>
-      <strong className={`mt-3 block text-xl font-black tracking-tight ${valueTone}`}>{value}</strong>
+    <div className="min-h-[96px] rounded-2xl border border-zinc-100 bg-zinc-50/80 px-5 py-4 shadow-sm relative overflow-hidden">
+      <div className={`absolute top-0 left-0 bottom-0 w-1 ${accent}`}></div>
+      <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400 pl-1">{label}</p>
+      <strong className={`mt-3 block text-xl font-black tracking-tight pl-1 ${valueTone}`}>{value}</strong>
     </div>
   );
 }
+

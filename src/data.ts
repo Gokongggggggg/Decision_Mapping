@@ -11,7 +11,8 @@ export const emptyState: AppState = {
       priority: 10,
       deadline: "2026-12-31",
       successMetrics: ["Complete CPTS", "Build portfolio", "Apply to internships"],
-      status: "active"
+      status: "active",
+      focusPercentage: 70
     }
   ],
   commitments: [
@@ -96,7 +97,8 @@ export const demoState: AppState = {
       priority: 10,
       deadline: "2026-12-31",
       successMetrics: ["Complete CPTS", "Build portfolio", "Apply to internships"],
-      status: "active"
+      status: "active",
+      focusPercentage: 70
     },
     {
       id: "goal_product_building",
@@ -105,7 +107,8 @@ export const demoState: AppState = {
       priority: 7,
       deadline: "2026-10-31",
       successMetrics: ["Ship MVP", "Get user feedback"],
-      status: "active"
+      status: "active",
+      focusPercentage: 20
     },
     {
       id: "goal_health",
@@ -114,7 +117,8 @@ export const demoState: AppState = {
       priority: 6,
       deadline: "",
       successMetrics: ["Train consistently", "Sleep baseline"],
-      status: "active"
+      status: "active",
+      focusPercentage: 10
     }
   ],
   commitments: [

@@ -2,7 +2,7 @@ export type TimeUnit = "total" | "per_day" | "per_week" | "per_month";
 export type DurationUnit = "day" | "week" | "month";
 export type Status = "active" | "paused" | "completed";
 export type OpportunityStatus = "pending_review" | "accepted" | "rejected" | "deferred";
-export type Recommendation = "Accept" | "Defer" | "Reject";
+export type Recommendation = "Accept" | "Defer" | "Reject" | "Accept With Adjustments";
 
 export interface Goal {
   id: string;
@@ -12,6 +12,7 @@ export interface Goal {
   deadline: string;
   successMetrics: string[];
   status: Status;
+  focusPercentage: number; // New: for Focus Budget
 }
 
 export interface Commitment {
@@ -43,6 +44,8 @@ export interface Opportunity {
   alignmentScore: number;
   expectedImpact: string[];
   status: OpportunityStatus;
+  decisionDate?: string; // New: for Decision Journal
+  decisionReason?: string; // New: for Decision Journal
 }
 
 export interface AppState {
@@ -63,6 +66,23 @@ export interface CapacityStats {
   projectedUtilization: number;
 }
 
+export interface AdjustmentPlan {
+  commitmentId: string;
+  commitmentName: string;
+  originalHours: number;
+  reducedHours: number;
+  reduction: number;
+}
+
+export interface FocusBudget {
+  goalId: string;
+  goalName: string;
+  budgetedPercentage: number;
+  currentPercentage: number;
+  projectedPercentage: number;
+  status: "Healthy" | "Warning" | "Critical";
+}
+
 export interface Evaluation {
   opportunity: Opportunity;
   stats: CapacityStats;
@@ -73,6 +93,8 @@ export interface Evaluation {
   capacityImpact: "Low" | "Medium" | "High";
   recommendation: Recommendation;
   tradeoffs: Commitment[];
+  adjustmentPlans: AdjustmentPlan[]; // New: Adjustment Planner
+  focusBudgets: FocusBudget[]; // New: Focus Budget
   affectedGoals: Goal[];
   goalImpact: "Low" | "Medium" | "High";
 }

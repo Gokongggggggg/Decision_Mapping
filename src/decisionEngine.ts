@@ -1,4 +1,4 @@
-import type { AppState, CapacityStats, Commitment, DurationUnit, Evaluation, Opportunity, TimeUnit } from "./types";
+import type { AdjustmentPlan, AppState, CapacityStats, Commitment, DurationUnit, Evaluation, FocusBudget, Opportunity, TimeUnit } from "./types";
 
 export function makeId(prefix: string) {
   if (globalThis.crypto?.randomUUID) return `${prefix}_${globalThis.crypto.randomUUID()}`;
@@ -77,8 +77,12 @@ export function evaluateOpportunity(state: AppState, opportunity: Opportunity): 
   const focusDrift = alignment >= 8 ? "Low" : alignment >= 5 ? "Medium" : "High";
   const capacityImpact = overflow === 0 ? "Low" : overflow <= 3 ? "Medium" : "High";
 
+  const adjustmentPlans = generateAdjustmentPlans(state, overflow);
+  const focusBudgets = calculateFocusBudgets(state, opportunity);
+
   let recommendation: Evaluation["recommendation"] = "Defer";
   if (alignment >= 8 && capacityImpact === "Low" && focusDrift !== "High") recommendation = "Accept";
+  if (alignment >= 6 && capacityImpact === "Medium" && adjustmentPlans.length > 0) recommendation = "Accept With Adjustments";
   if (alignment <= 4 && capacityImpact === "High" && focusDrift === "High") recommendation = "Reject";
   if (alignment <= 4 && capacityImpact !== "Low") recommendation = "Reject";
 
@@ -88,7 +92,7 @@ export function evaluateOpportunity(state: AppState, opportunity: Opportunity): 
     .filter((goal): goal is NonNullable<typeof goal> => Boolean(goal));
   const goalImpact = overflow === 0 ? "Low" : tradeoffs.some((item) => Number(item.priority || 0) >= topGoalPriority) ? "High" : "Medium";
 
-  return { opportunity, stats, opportunityImpact, overflow, alignment, focusDrift, capacityImpact, recommendation, tradeoffs, affectedGoals, goalImpact };
+  return { opportunity, stats, opportunityImpact, overflow, alignment, focusDrift, capacityImpact, recommendation, tradeoffs, adjustmentPlans, focusBudgets, affectedGoals, goalImpact };
 }
 
 export function findTradeoffs(state: AppState, overflow: number): Commitment[] {
@@ -98,10 +102,85 @@ export function findTradeoffs(state: AppState, overflow: number): Commitment[] {
     .slice(0, 3);
 }
 
+export function generateAdjustmentPlans(state: AppState, overflow: number): AdjustmentPlan[] {
+  if (overflow <= 0) return [];
+  
+  const activeComms = activeCommitments(state).sort((a, b) => Number(a.priority || 0) - Number(b.priority || 0));
+  const plans: AdjustmentPlan[] = [];
+  let remainingOverflow = overflow;
+
+  for (const comm of activeComms) {
+    if (remainingOverflow <= 0) break;
+    const weekly = weeklyImpact(comm);
+    const reduction = Math.min(weekly, remainingOverflow);
+    if (reduction > 0) {
+      plans.push({
+        commitmentId: comm.id,
+        commitmentName: comm.name,
+        originalHours: weekly,
+        reducedHours: weekly - reduction,
+        reduction
+      });
+      remainingOverflow -= reduction;
+    }
+  }
+
+  return plans;
+}
+
+export function calculateFocusBudgets(state: AppState, opportunity?: Opportunity): FocusBudget[] {
+  const totalCapacity = Number(state.weeklyCapacity || 40);
+  const activeComms = activeCommitments(state);
+  
+  const getGoalHours = (goalId: string, extraOpportunity?: Opportunity) => {
+    let hours = activeComms
+      .filter(c => c.goalId === goalId)
+      .reduce((sum, c) => sum + weeklyImpact(c), 0);
+    
+    // If opportunity aligns with this goal (simplification: based on category or notes)
+    // For now, let's assume if it's evaluated, it adds to its category if we had that mapping.
+    // Since we don't have a direct Goal <-> Opportunity mapping yet, 
+    // we just use the existing hours for "Current".
+    return hours;
+  };
+
+  const totalAllocated = activeComms.reduce((sum, c) => sum + weeklyImpact(c), 0);
+  const oppImpact = opportunity ? weeklyImpact(opportunity) : 0;
+  const projectedTotal = totalAllocated + oppImpact;
+
+  return state.goals.map(goal => {
+    const currentHours = getGoalHours(goal.id);
+    const currentPercentage = totalAllocated > 0 ? Math.round((currentHours / totalAllocated) * 100) : 0;
+    
+    // Projected percentage: if we accept the opportunity, how does focus shift?
+    // This is tricky because we don't know which goal the opportunity belongs to.
+    // PRD says "Users allocate focus percentages".
+    // Let's assume the opportunity might take away from everything proportionally or 
+    // simply add to the total, diluting existing ones unless it's mapped.
+    
+    const projectedPercentage = projectedTotal > 0 ? Math.round((currentHours / projectedTotal) * 100) : 0;
+    
+    const diff = Math.abs(projectedPercentage - goal.focusPercentage);
+    let status: FocusBudget["status"] = "Healthy";
+    if (diff > 15) status = "Critical";
+    else if (diff > 5) status = "Warning";
+
+    return {
+      goalId: goal.id,
+      goalName: goal.name,
+      budgetedPercentage: goal.focusPercentage,
+      currentPercentage,
+      projectedPercentage,
+      status
+    };
+  });
+}
+
 export function splitList(value: string) {
   return value
-    .split(",")
+    .split(/[\n,]/)
     .map((item) => item.trim())
+    .map((item) => item.replace(/^[-*•]\s*/, ""))
     .filter(Boolean);
 }
 
@@ -118,5 +197,6 @@ export function statusLabel(status: Opportunity["status"]) {
 export function recommendationTone(value: string) {
   if (value === "Accept" || value === "Accepted") return "good";
   if (value === "Reject" || value === "Rejected") return "bad";
+  if (value === "Accept With Adjustments") return "warn";
   return "warn";
 }
