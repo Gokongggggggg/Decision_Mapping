@@ -14,6 +14,7 @@ It is intentionally simple, local-first, and built for fast iteration. The produ
 
 ## Current Features
 
+- Opportunity-first entry screen
 - Goal planning
 - Action plans attached to goals
 - Supporting commitments attached to goals

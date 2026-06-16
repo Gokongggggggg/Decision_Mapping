@@ -157,7 +157,6 @@ function render() {
   renderSelects();
   renderOpportunityFormState();
   renderGoals();
-  renderCommitments();
   renderOpportunities();
   renderEvaluation();
 }
@@ -267,7 +266,7 @@ function renderInitiativeRow(item) {
     <div class="mini-item">
       <div>
         <strong>${escapeHtml(item.name)}</strong>
-        <span>${hours(item.estimatedWeeklyHours)}/week · ${item.progress || 0}% · ${escapeHtml(item.status)}</span>
+        <span>${hours(item.estimatedWeeklyHours)}/week - ${item.progress || 0}% - ${escapeHtml(item.status)}</span>
       </div>
       <div class="entity-actions">
         <button data-toggle-initiative="${item.id}">${item.status === "completed" ? "Reopen" : "Complete"}</button>
@@ -282,35 +281,13 @@ function renderCommitmentRow(item) {
     <div class="mini-item">
       <div>
         <strong>${escapeHtml(item.name)}</strong>
-        <span>${hours(item.weeklyHours)}/week · ${escapeHtml(item.energyCost)} energy · ${escapeHtml(item.type)}</span>
+        <span>${hours(item.weeklyHours)}/week - ${escapeHtml(item.energyCost)} energy - ${escapeHtml(item.type)}</span>
       </div>
       <div class="entity-actions">
         <button class="danger-action" data-delete-commitment="${item.id}">Delete</button>
       </div>
     </div>
   `;
-}
-
-function renderCommitments() {
-  $("#commitmentCount").textContent = `${state.commitments.length} active`;
-  $("#commitmentsList").innerHTML = state.commitments.map((item) => `
-    <div class="entity">
-      <div class="entity-top">
-        <div>
-          <h4 class="entity-title">${escapeHtml(item.name)}</h4>
-          <p>${escapeHtml(goalById(item.goalId)?.name || "General commitment")}${item.notes ? ` · ${escapeHtml(item.notes)}` : ""}</p>
-        </div>
-        <div class="entity-actions">
-          <button class="danger-action" data-delete-commitment="${item.id}">Delete</button>
-        </div>
-      </div>
-      <div class="entity-meta">
-        <span class="tag">${hours(item.weeklyHours)}/week</span>
-        <span class="tag ${item.energyCost === "high" ? "red" : item.energyCost === "medium" ? "amber" : "green"}">${escapeHtml(item.energyCost)} energy</span>
-        <span class="tag blue">${escapeHtml(item.type)}</span>
-      </div>
-    </div>
-  `).join("") || empty("No commitments yet.");
 }
 
 function renderOpportunities() {
@@ -384,10 +361,12 @@ function renderEvaluation() {
   if (!selected) {
     output.className = "evaluation-empty";
     output.textContent = "Create or select an opportunity to see the cost of saying yes.";
+    $("#selectedOpportunityLabel").textContent = "No selection";
     return;
   }
 
   state.selectedOpportunityId = selected.id;
+  $("#selectedOpportunityLabel").textContent = selected.title;
   const evaluation = evaluateOpportunity(selected);
   const commitmentLoad = state.commitments
     .map((item) => `<li>${escapeHtml(item.name)}: ${hours(item.weeklyHours)}/week, ${escapeHtml(item.type)}</li>`)
@@ -588,7 +567,7 @@ $("#opportunityForm").addEventListener("submit", (event) => {
 
   form.reset();
   render();
-  setView("dashboard");
+  setView("opportunities");
 });
 
 $("#cancelOpportunityEdit").addEventListener("click", () => {
@@ -627,7 +606,7 @@ document.addEventListener("click", (event) => {
 
   if (selectOpportunity) {
     state.selectedOpportunityId = selectOpportunity;
-    setView("dashboard");
+    setView("opportunities");
   }
 
   if (editOpportunity) {

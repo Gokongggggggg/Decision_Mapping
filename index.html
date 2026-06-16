@@ -17,10 +17,9 @@
           </div>
         </div>
         <nav class="nav" aria-label="Primary">
-          <button class="nav-item active" data-view="dashboard">Dashboard</button>
+          <button class="nav-item active" data-view="opportunities">Opportunities</button>
+          <button class="nav-item" data-view="dashboard">Dashboard</button>
           <button class="nav-item" data-view="goals">Goals</button>
-          <button class="nav-item" data-view="commitments">Commitments</button>
-          <button class="nav-item" data-view="opportunities">Opportunities</button>
         </nav>
       </aside>
 
@@ -28,7 +27,7 @@
         <section class="topbar">
           <div>
             <p class="eyebrow">MVP v0.1</p>
-            <h2 id="viewTitle">Dashboard</h2>
+            <h2 id="viewTitle">Opportunities</h2>
           </div>
           <div class="topbar-actions">
             <label class="capacity-control" for="weeklyCapacity" data-tooltip="Total realistic hours you can spend on goals, initiatives, commitments, and new opportunities each week.">
@@ -42,7 +41,7 @@
           </div>
         </section>
 
-        <section class="view active" id="dashboardView">
+        <section class="view" id="dashboardView">
           <div class="metrics-grid">
             <article class="metric" data-tooltip="Hours already allocated to action plans and recurring commitments.">
               <span>Allocated</span>
@@ -84,14 +83,6 @@
                 <button class="text-button" data-jump="goals">Manage</button>
               </div>
               <div id="goalSummary" class="summary-list"></div>
-            </section>
-
-            <section class="panel wide">
-              <div class="panel-header">
-                <h3>Opportunity Evaluation</h3>
-                <button class="text-button" data-jump="opportunities">Open Inbox</button>
-              </div>
-              <div id="evaluationOutput" class="evaluation-empty">Create or select an opportunity to see the cost of saying yes.</div>
             </section>
           </div>
         </section>
@@ -168,19 +159,7 @@
           </div>
         </section>
 
-        <section class="view" id="commitmentsView">
-          <div class="single-panel">
-            <div class="panel">
-              <div class="panel-header">
-                <h3>Commitments</h3>
-                <span id="commitmentCount">0 active</span>
-              </div>
-              <div id="commitmentsList" class="entity-list"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="opportunitiesView">
+        <section class="view active" id="opportunitiesView">
           <div class="work-grid opportunities-grid">
             <form id="opportunityForm" class="form-panel">
               <div class="form-header">
@@ -243,6 +222,13 @@
               </div>
               <div id="opportunitiesList" class="entity-list"></div>
             </div>
+            <section class="panel wide">
+              <div class="panel-header">
+                <h3>Opportunity Evaluation</h3>
+                <span id="selectedOpportunityLabel">No selection</span>
+              </div>
+              <div id="evaluationOutput" class="evaluation-empty">Create or select an opportunity to see the cost of saying yes.</div>
+            </section>
           </div>
         </section>
       </main>
